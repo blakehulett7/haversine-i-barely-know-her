@@ -1,36 +1,36 @@
 package json
 
 type token struct {
-	token_type string
-	value      string
+	kind  string
+	value string
 }
 
 var object_start = token{
-	token_type: "object",
-	value:      "start",
+	kind:  "start",
+	value: "object",
 }
 
 var object_end = token{
-	token_type: "object",
-	value:      "end",
+	kind:  "end",
+	value: "object",
 }
 
 var array_start = token{
-	token_type: "array",
-	value:      "start",
+	kind:  "start",
+	value: "array",
 }
 
 var array_end = token{
-	token_type: "array",
-	value:      "end",
+	kind:  "end",
+	value: "array",
 }
 
 var comma = token{
-	token_type: "control",
-	value:      ",",
+	kind:  "control",
+	value: ",",
 }
 
 var colon = token{
-	token_type: "control",
-	value:      ":",
+	kind:  "control",
+	value: ":",
 }

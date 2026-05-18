@@ -1,28 +1,36 @@
 package json
 
-type stack struct {
-	data  []rune
+type stack[T any] struct {
+	data  []T
 	index int
 }
 
-func newStack() stack {
-	return stack{
+func newStack[T any]() stack[T] {
+	return stack[T]{
 		data:  nil,
 		index: -1,
 	}
 }
 
-func (s *stack) Push(r rune) {
-	s.data = append(s.data, r)
+func (s *stack[T]) push(v T) {
+	s.data = append(s.data, v)
 	s.index++
 }
 
-func (s *stack) Pop() rune {
+func (s *stack[T]) pop() T {
 	if len(s.data) == 0 {
-		return 0
+		return *new(T)
 	}
 
-	r := s.data[s.index]
+	v := s.data[s.index]
 	s.index--
-	return r
+	return v
+}
+
+func (s *stack[T]) peek() (v T) {
+	if len(s.data) == 0 {
+		return
+	}
+
+	return s.data[s.index]
 }

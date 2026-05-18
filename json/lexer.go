@@ -26,7 +26,7 @@ func lexRunes(runes []rune) ([]token, error) {
 
 		switch lexer.status {
 		default:
-			return nil, fmt.Errorf("invalid lexer status")
+			return nil, fmt.Errorf("invalid lexer status: %v\n", lexer.status)
 		case lexer_normal:
 			err = lexNormal(&lexer, r)
 		case int_open:
@@ -43,7 +43,7 @@ func lexRunes(runes []rune) ([]token, error) {
 	}
 
 	if lexer.status != lexer_normal {
-		return nil, fmt.Errorf("invalid lexer status, %s\n", lexer.status)
+		return nil, fmt.Errorf("invalid lexer status: %v\n", lexer.status)
 	}
 
 	return lexer.tokens, nil
@@ -103,7 +103,7 @@ func lexInt(lexer *lexer, r rune) error {
 	}
 
 	lexer.tokens = append(lexer.tokens, token{
-		token_type: "int",
+		kind: "int",
 		value:      string(lexer.buffer),
 	})
 
@@ -132,7 +132,7 @@ func lexFloat(lexer *lexer, r rune) error {
 	}
 
 	lexer.tokens = append(lexer.tokens, token{
-		token_type: "float",
+		kind: "float",
 		value:      string(lexer.buffer),
 	})
 
@@ -153,7 +153,7 @@ func lexString(lexer *lexer, r rune) error {
 	}
 
 	lexer.tokens = append(lexer.tokens, token{
-		token_type: "string",
+		kind: "string",
 		value:      string(lexer.buffer),
 	})
 
