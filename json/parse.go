@@ -38,8 +38,9 @@ func Parse(dest any, data []byte) error {
 	fmt.Println(tokens)
 
 	parser := newParser()
-	parser.dest = v
+	parser.dest_stack.push(t)
 	for _, t := range tokens {
+		fmt.Println(parser.status, parser.key_stack, t)
 		err = parser.read(t)
 	}
 
@@ -51,7 +52,7 @@ type parser struct {
 	valid_close bool
 	valid_open  bool
 
-	dest_stack stack[reflect.Value]
+	dest_stack stack[reflect.Type]
 	key_stack  stack[string]
 	final      any
 
@@ -61,7 +62,7 @@ type parser struct {
 func newParser() *parser {
 	return &parser{
 		status:     parse_value,
-		dest_stack: newStack[reflect.Value](),
+		dest_stack: newStack[reflect.Type](),
 		key_stack:  newStack[string](),
 	}
 }
@@ -72,6 +73,8 @@ func (p *parser) read(token token) error {
 		return fmt.Errorf("invalid parser status")
 	case parse_array:
 		return p.read_array(token)
+	case parse_key:
+		return p.read_key(token)
 	case parse_object:
 		return p.read_object(token)
 	case parse_value:
@@ -80,10 +83,50 @@ func (p *parser) read(token token) error {
 }
 
 func (p *parser) read_array(t token) error {
+	switch t.kind {
+	default:
+		return fmt.Errorf("invalid json: unexpected token %v", t)
+	case "start":
+	case "end":
+	case "string", "int", "float":
+	}
+
+	return nil
+}
+
+func (p *parser) read_key(t token) error {
+	if t.kind != "control" && t.value != ":" {
+		return fmt.Errorf("invalid json: key not terminated got %v", t)
+	}
+	p.status = parse_value
+
+	key := p.key_stack.peek()
+	dest := p.dest_stack.peek()
+	field, ok := dest.FieldByName(key)
+
+	if !ok {
+		return fmt.Errorf("no struct field matches the given key: %s\n", key)
+	}
+
+	if dest.Kind() != reflect.Struct {
+		return fmt.Errorf("invalid parser status, must be in a struct to read a key")
+	}
+
+	p.dest_stack.push(field.Type)
+
 	return nil
 }
 
 func (p *parser) read_object(t token) error {
+	switch t.kind {
+	default:
+		return fmt.Errorf("invalid json: expected key but got %v", t)
+	case "string":
+		p.key_stack.push(t.value)
+		p.status = parse_key
+		return nil
+	}
+
 	return nil
 }
 
@@ -94,7 +137,7 @@ func (p *parser) read_value(t token) error {
 	case "control":
 		fallthrough
 	case "end":
-		return fmt.Errorf("invalid json: unexpected token: %v", t)
+		return fmt.Errorf("invalid json: unexpected token %v", t)
 	case "start":
 		if t.value == "array" {
 			p.status = parse_array
@@ -115,6 +158,7 @@ type parser_status byte
 
 const (
 	parse_array parser_status = iota
+	parse_key
 	parse_object
 	parse_value
 )
@@ -125,6 +169,8 @@ func (ps parser_status) String() string {
 		return "invalid status"
 	case parse_array:
 		return "parse_array"
+	case parse_key:
+		return "parse_key"
 	case parse_object:
 		return "parse_object"
 	case parse_value:

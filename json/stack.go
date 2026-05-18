@@ -13,16 +13,23 @@ func newStack[T any]() stack[T] {
 }
 
 func (s *stack[T]) push(v T) {
-	s.data = append(s.data, v)
+	idx := s.index + 1
+
+	if idx >= len(s.data) {
+		s.data = append(s.data, v)
+	} else {
+		s.data[idx] = v
+	}
+
 	s.index++
 }
 
-func (s *stack[T]) pop() T {
+func (s *stack[T]) pop() (v T) {
 	if len(s.data) == 0 {
-		return *new(T)
+		return
 	}
 
-	v := s.data[s.index]
+	v = s.data[s.index]
 	s.index--
 	return v
 }

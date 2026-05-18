@@ -103,8 +103,8 @@ func lexInt(lexer *lexer, r rune) error {
 	}
 
 	lexer.tokens = append(lexer.tokens, token{
-		kind: "int",
-		value:      string(lexer.buffer),
+		kind:  "int",
+		value: string(lexer.buffer),
 	})
 
 	lexer.buffer = nil
@@ -132,8 +132,8 @@ func lexFloat(lexer *lexer, r rune) error {
 	}
 
 	lexer.tokens = append(lexer.tokens, token{
-		kind: "float",
-		value:      string(lexer.buffer),
+		kind:  "float",
+		value: string(lexer.buffer),
 	})
 
 	lexer.buffer = nil
@@ -153,8 +153,8 @@ func lexString(lexer *lexer, r rune) error {
 	}
 
 	lexer.tokens = append(lexer.tokens, token{
-		kind: "string",
-		value:      string(lexer.buffer),
+		kind:  "string",
+		value: string(lexer.buffer),
 	})
 
 	lexer.buffer = nil
