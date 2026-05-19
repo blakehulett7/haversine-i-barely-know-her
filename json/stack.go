@@ -1,5 +1,7 @@
 package json
 
+import "fmt"
+
 type stack[T any] struct {
 	data  []T
 	index int
@@ -40,4 +42,8 @@ func (s *stack[T]) peek() (v T) {
 	}
 
 	return s.data[s.index]
+}
+
+func (s stack[T]) String() string {
+	return fmt.Sprintf("%v", s.data[:s.index+1])
 }

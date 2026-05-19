@@ -3,6 +3,10 @@ package json
 import (
 	"fmt"
 	"reflect"
+	"strconv"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func Parse(dest any, data []byte) error {
@@ -10,6 +14,8 @@ func Parse(dest any, data []byte) error {
 	if v.Kind() != reflect.Pointer {
 		return fmt.Errorf("invalid destination, use a pointer to a struct")
 	}
+
+	fmt.Printf("%+v\n", v.Elem())
 
 	fmt.Println(v.Elem().Kind())
 	t := v.Elem().Type()
@@ -36,12 +42,17 @@ func Parse(dest any, data []byte) error {
 	}
 
 	fmt.Println(tokens)
+	fmt.Println()
 
 	parser := newParser()
-	parser.dest_stack.push(t)
+	parser.dest_stack.push(v.Elem())
 	for _, t := range tokens {
-		fmt.Println(parser.status, parser.key_stack, t)
+		fmt.Println(parser.status, parser.key_stack, parser.status_stack, t)
 		err = parser.read(t)
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -52,18 +63,20 @@ type parser struct {
 	valid_close bool
 	valid_open  bool
 
-	dest_stack stack[reflect.Type]
-	key_stack  stack[string]
-	final      any
+	dest_stack   stack[reflect.Value]
+	key_stack    stack[string]
+	status_stack stack[parser_status]
 
-	dest reflect.Value
+	final any
+	dest  reflect.Value
 }
 
 func newParser() *parser {
 	return &parser{
-		status:     parse_value,
-		dest_stack: newStack[reflect.Type](),
-		key_stack:  newStack[string](),
+		status:       parse_value,
+		dest_stack:   newStack[reflect.Value](),
+		key_stack:    newStack[string](),
+		status_stack: newStack[parser_status](),
 	}
 }
 
@@ -86,8 +99,22 @@ func (p *parser) read_array(t token) error {
 	switch t.kind {
 	default:
 		return fmt.Errorf("invalid json: unexpected token %v", t)
-	case "start":
 	case "end":
+	case "start":
+		if t.value == "object" {
+			p.status_stack.push(parse_array)
+			p.status = parse_object
+
+			dest := p.dest_stack.peek()
+			fmt.Printf("dest: %+v\n", dest.Type().Elem())
+			fmt.Println()
+
+			obj := reflect.New(dest.Type().Elem()).Elem()
+			p.dest_stack.push(obj)
+			return nil
+		}
+
+		return nil
 	case "string", "int", "float":
 	}
 
@@ -102,17 +129,16 @@ func (p *parser) read_key(t token) error {
 
 	key := p.key_stack.peek()
 	dest := p.dest_stack.peek()
-	field, ok := dest.FieldByName(key)
+	field := dest.FieldByName(key)
 
-	if !ok {
-		return fmt.Errorf("no struct field matches the given key: %s\n", key)
-	}
+	fmt.Printf("key: %+v\n", key)
+	fmt.Printf("dest: %+v\n", dest)
+	fmt.Printf("field: %+v\n", field)
+	fmt.Println()
 
 	if dest.Kind() != reflect.Struct {
 		return fmt.Errorf("invalid parser status, must be in a struct to read a key")
 	}
-
-	p.dest_stack.push(field.Type)
 
 	return nil
 }
@@ -122,33 +148,77 @@ func (p *parser) read_object(t token) error {
 	default:
 		return fmt.Errorf("invalid json: expected key but got %v", t)
 	case "string":
-		p.key_stack.push(t.value)
+		key := cases.Title(language.English).String(t.value)
+		p.key_stack.push(key)
+		p.status_stack.push(parse_object)
 		p.status = parse_key
 		return nil
 	}
-
-	return nil
 }
 
 func (p *parser) read_value(t token) error {
 	switch t.kind {
 	default:
-		fallthrough
-	case "control":
-		fallthrough
-	case "end":
 		return fmt.Errorf("invalid json: unexpected token %v", t)
-	case "start":
-		if t.value == "array" {
-			p.status = parse_array
-			return nil
+	case "end":
+
+		p.key_stack.pop()
+		p.status_stack.pop()
+		p.status = p.status_stack.pop()
+
+	case "control":
+
+		if t.value == ":" {
+			return fmt.Errorf("invalid json: unexpected :")
 		}
 
+		p.key_stack.pop()
+		p.status = p.status_stack.pop()
+
+	case "start":
 		if t.value == "object" {
+			p.status_stack.push(p.status)
 			p.status = parse_object
 			return nil
 		}
-	case "string", "int", "float":
+
+		if t.value == "array" {
+			p.status_stack.push(p.status)
+			p.status = parse_array
+
+			key := p.key_stack.peek()
+			dest := p.dest_stack.peek()
+			field := dest.FieldByName(key)
+
+			if field.Kind() != reflect.Slice {
+				return fmt.Errorf("invalid parser status, must be in a slice to read an array")
+			}
+
+			fmt.Printf("key: %s\n", key)
+			fmt.Printf("dest: %v\n", dest)
+			fmt.Printf("field: %v\n", field)
+			fmt.Println()
+
+			p.dest_stack.push(field)
+			return nil
+		}
+
+	case "float":
+		key := p.key_stack.peek()
+		dest := p.dest_stack.peek()
+		field := dest.FieldByName(key)
+
+		f, err := strconv.ParseFloat(t.value, 64)
+		if err != nil {
+			return fmt.Errorf("invalid json: could not parse float %v\n", err)
+		}
+		field.SetFloat(f)
+
+		fmt.Printf("key: %s\n", key)
+		fmt.Printf("dest: %v\n", dest)
+		fmt.Printf("field: %v\n", field)
+		fmt.Println()
+	case "string", "int":
 	}
 
 	return nil

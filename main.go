@@ -7,14 +7,14 @@ import (
 )
 
 type Data struct {
-	pairs []Row `json:"pairs"`
+	Pairs []Row `json:"pairs"`
 }
 
 type Row struct {
-	x0 float64 `json:"x0"`
-	y0 float64 `json:"y0"`
-	x1 float64 `json:"x1"`
-	y1 float64 `json:"y1"`
+	X0 float64 `json:"x0"`
+	Y0 float64 `json:"y0"`
+	X1 float64 `json:"x1"`
+	Y1 float64 `json:"y1"`
 }
 
 const EarthRadius = 6372.8
