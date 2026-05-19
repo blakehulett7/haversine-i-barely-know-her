@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
 	"haversine-i-barely-know-her/json"
 	"os"
@@ -26,11 +27,37 @@ func main() {
 		os.Exit(1)
 	}
 
-	var dest Data
+	var input Data
 
-	err = json.Parse(&dest, data)
+	err = json.Parse(&input, data)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
+	var rolling_sum float64
+	answers := []float64{}
+	for _, pair := range input.Pairs {
+		haversine := ReferenceHaversine(pair)
+		answers = append(answers, haversine)
+		rolling_sum += haversine
+	}
+
+	avg := rolling_sum / float64(len(input.Pairs))
+
+	path := "out.f64"
+	file, err := os.Create(path)
+	if err != nil {
+		fmt.Println("could not create answer file")
+		os.Exit(1)
+	}
+	defer file.Close()
+
+	err = binary.Write(file, binary.LittleEndian, answers)
+	if err != nil {
+		fmt.Println("could not save answer file")
+		os.Exit(1)
+	}
+
+	fmt.Printf("got avg: %f\n", avg)
 }
