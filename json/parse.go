@@ -15,24 +15,6 @@ func Parse(dest any, data []byte) error {
 		return fmt.Errorf("invalid destination, use a pointer to a struct")
 	}
 
-	fmt.Printf("%+v\n", v.Elem())
-
-	fmt.Println(v.Elem().Kind())
-	t := v.Elem().Type()
-	fmt.Println(v.Elem().Type().NumField())
-
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		fmt.Printf("%+v\n", field)
-		fmt.Println(field.Tag.Get("json"))
-		fmt.Println(field.Type)
-		fmt.Println(field.Type.Kind())
-		for j := 0; j < field.Type.Elem().NumField(); j++ {
-			nested := field.Type.Elem().Field(j)
-			fmt.Println(nested)
-		}
-	}
-
 	s := string(data)
 	runes := []rune(s)
 
@@ -41,19 +23,18 @@ func Parse(dest any, data []byte) error {
 		return err
 	}
 
-	fmt.Println(tokens)
-	fmt.Println()
-
 	parser := newParser()
 	parser.dest_stack.push(v.Elem())
 	for _, t := range tokens {
-		fmt.Println(parser.status, parser.key_stack, parser.status_stack, t)
+		// fmt.Println(parser.status, parser.key_stack, parser.status_stack, t)
 		err = parser.read(t)
 
 		if err != nil {
 			return err
 		}
 	}
+
+	// fmt.Println()
 
 	return nil
 }
@@ -99,6 +80,14 @@ func (p *parser) read_array(t token) error {
 	switch t.kind {
 	default:
 		return fmt.Errorf("invalid json: unexpected token %v", t)
+	case "control":
+
+		if t.value != "," {
+			return fmt.Errorf("invalid json: unexpected :")
+		}
+
+		return nil
+
 	case "end":
 	case "start":
 		if t.value == "object" {
@@ -106,8 +95,6 @@ func (p *parser) read_array(t token) error {
 			p.status = parse_object
 
 			dest := p.dest_stack.peek()
-			fmt.Printf("dest: %+v\n", dest.Type().Elem())
-			fmt.Println()
 
 			obj := reflect.New(dest.Type().Elem()).Elem()
 			p.dest_stack.push(obj)
@@ -127,14 +114,7 @@ func (p *parser) read_key(t token) error {
 	}
 	p.status = parse_value
 
-	key := p.key_stack.peek()
 	dest := p.dest_stack.peek()
-	field := dest.FieldByName(key)
-
-	fmt.Printf("key: %+v\n", key)
-	fmt.Printf("dest: %+v\n", dest)
-	fmt.Printf("field: %+v\n", field)
-	fmt.Println()
 
 	if dest.Kind() != reflect.Struct {
 		return fmt.Errorf("invalid parser status, must be in a struct to read a key")
@@ -162,9 +142,14 @@ func (p *parser) read_value(t token) error {
 		return fmt.Errorf("invalid json: unexpected token %v", t)
 	case "end":
 
+		obj := p.dest_stack.pop()
+
 		p.key_stack.pop()
 		p.status_stack.pop()
 		p.status = p.status_stack.pop()
+
+		dest := p.dest_stack.peek()
+		dest.Set(reflect.Append(dest, obj))
 
 	case "control":
 
@@ -194,11 +179,6 @@ func (p *parser) read_value(t token) error {
 				return fmt.Errorf("invalid parser status, must be in a slice to read an array")
 			}
 
-			fmt.Printf("key: %s\n", key)
-			fmt.Printf("dest: %v\n", dest)
-			fmt.Printf("field: %v\n", field)
-			fmt.Println()
-
 			p.dest_stack.push(field)
 			return nil
 		}
@@ -214,10 +194,6 @@ func (p *parser) read_value(t token) error {
 		}
 		field.SetFloat(f)
 
-		fmt.Printf("key: %s\n", key)
-		fmt.Printf("dest: %v\n", dest)
-		fmt.Printf("field: %v\n", field)
-		fmt.Println()
 	case "string", "int":
 	}
 
