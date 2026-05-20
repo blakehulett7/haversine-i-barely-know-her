@@ -4,12 +4,20 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"time"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
 func Parse(dest any, data []byte) error {
+	start := time.Now()
+	defer func() {
+		end := time.Now()
+		elapsed := end.Sub(start)
+		fmt.Println(elapsed)
+	}()
+
 	v := reflect.ValueOf(dest)
 	if v.Kind() != reflect.Pointer {
 		return fmt.Errorf("invalid destination, use a pointer to a struct")
