@@ -2,6 +2,7 @@ package json
 
 import (
 	"fmt"
+	"haversine-i-barely-know-her/metrics"
 	"unicode"
 )
 
@@ -19,6 +20,9 @@ func newLexer() lexer {
 }
 
 func lexRunes(runes []rune) ([]token, error) {
+	start := metrics.Start(metrics.LexJSON)
+	defer metrics.ReportMetrics(start, metrics.LexJSON)
+
 	lexer := newLexer()
 
 	for _, r := range runes {

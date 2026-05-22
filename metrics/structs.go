@@ -11,6 +11,7 @@ type Label enum
 
 const (
 	ParseJSON Label = iota + 1
+	LexJSON
 	ReferenceHaversine
 )
 
@@ -22,14 +23,17 @@ func (l Label) String() string {
 		return "json.Parse"
 	case ReferenceHaversine:
 		return "ReferenceHaversine"
+	case LexJSON:
+		return "json.lex"
 	}
 }
 
-type Metrics [3]Metric
+type Metrics [4]Metric
 
 type Metric struct {
 	Start    bool
 	Label    Label
+	Child    Label
 	Hits     int
 	Duration time.Duration
 }

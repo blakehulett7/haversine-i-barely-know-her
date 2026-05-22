@@ -3,11 +3,10 @@ package main
 import (
 	"haversine-i-barely-know-her/metrics"
 	"math"
-	"time"
 )
 
 func ReferenceHaversine(pair Row) float64 {
-	start := time.Now()
+	start := metrics.Start(metrics.ReferenceHaversine)
 	defer metrics.ReportMetrics(start, metrics.ReferenceHaversine)
 
 	lat1 := pair.Y0

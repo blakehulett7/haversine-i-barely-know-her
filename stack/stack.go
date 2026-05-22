@@ -27,7 +27,7 @@ func (s *Stack[T]) Push(v T) {
 }
 
 func (s *Stack[T]) Pop() (v T) {
-	if len(s.data) == 0 {
+	if len(s.data) == 0 || s.index < 0 {
 		return
 	}
 
@@ -37,7 +37,7 @@ func (s *Stack[T]) Pop() (v T) {
 }
 
 func (s *Stack[T]) Peek() (v T) {
-	if len(s.data) == 0 {
+	if len(s.data) == 0 || s.index < 0 {
 		return
 	}
 

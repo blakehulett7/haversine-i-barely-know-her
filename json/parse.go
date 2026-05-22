@@ -6,14 +6,13 @@ import (
 	"haversine-i-barely-know-her/stack"
 	"reflect"
 	"strconv"
-	"time"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
 func Parse(dest any, data []byte) error {
-	start := time.Now()
+	start := metrics.Start(metrics.ParseJSON)
 	defer metrics.ReportMetrics(start, metrics.ParseJSON)
 
 	v := reflect.ValueOf(dest)

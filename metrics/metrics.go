@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"fmt"
+	"haversine-i-barely-know-her/stack"
 	"time"
 )
 
@@ -13,16 +14,21 @@ func NewMetrics() chan bool {
 	go func() {
 		start := time.Now()
 		var metrics Metrics
+		parents := stack.New[Label]()
 
 		for metric := range MetricsChan {
 			if metric.Start {
-
+				parents.Push(metric.Label)
 				continue
 			}
+
+			parents.Pop()
+			parent := parents.Peek()
 
 			metrics[metric.Label].Duration += metric.Duration
 			metrics[metric.Label].Hits++
 			metrics[metric.Label].Label = metric.Label
+			metrics[parent].Child = metric.Label
 		}
 
 		total_elapsed := time.Since(start)
@@ -56,7 +62,11 @@ func print_metrics(metrics Metrics, total_elapsed time.Duration) {
 			continue
 		}
 
-		fmt.Printf("\t%s[%d]: Time: %d (%.2f%%)\n", metric.Label, metric.Hits, metric.Duration, asPercent(metric.Duration, total_elapsed))
+		fmt.Printf("\t%s[%d]: Time: %d (%.2f%%)", metric.Label, metric.Hits, metric.Duration, asPercent(metric.Duration, total_elapsed))
+		if metric.Child != 0 {
+			fmt.Printf(", Child: %s", metric.Child)
+		}
+		fmt.Println()
 	}
 }
 
