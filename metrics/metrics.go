@@ -19,6 +19,11 @@ func NewMetrics() chan bool {
 		for metric := range MetricsChan {
 			if metric.Start {
 				metrics[metric.Label].Nested++
+
+				if metrics[metric.Label].Nested > 1 {
+					continue
+				}
+
 				parents.Push(metric.Label)
 				continue
 			}
