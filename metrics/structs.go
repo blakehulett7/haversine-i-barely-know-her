@@ -35,6 +35,7 @@ type Metric struct {
 	Label            Label
 	Child            Label
 	Hits             int
+	Nested           int
 	ExlusiveDuration time.Duration
 	Duration         time.Duration
 }

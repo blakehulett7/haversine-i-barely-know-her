@@ -18,17 +18,25 @@ func NewMetrics() chan bool {
 
 		for metric := range MetricsChan {
 			if metric.Start {
+				metrics[metric.Label].Nested++
 				parents.Push(metric.Label)
+				continue
+			}
+
+			if metrics[metric.Label].Nested > 1 {
+				metrics[metric.Label].Nested--
 				continue
 			}
 
 			parents.Pop()
 			parent := parents.Peek()
-
-			metrics[metric.Label].Duration += metric.Duration
-			metrics[metric.Label].Hits++
-			metrics[metric.Label].Label = metric.Label
 			metrics[parent].Child = metric.Label
+
+			metrics[metric.Label].Label = metric.Label
+			metrics[metric.Label].Duration += metric.Duration
+
+			metrics[metric.Label].Hits++
+			metrics[metric.Label].Nested--
 		}
 
 		total_elapsed := time.Since(start)
