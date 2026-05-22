@@ -1,20 +1,20 @@
-package json
+package stack
 
 import "fmt"
 
-type stack[T any] struct {
+type Stack[T any] struct {
 	data  []T
 	index int
 }
 
-func newStack[T any]() stack[T] {
-	return stack[T]{
+func New[T any]() Stack[T] {
+	return Stack[T]{
 		data:  nil,
 		index: -1,
 	}
 }
 
-func (s *stack[T]) push(v T) {
+func (s *Stack[T]) Push(v T) {
 	idx := s.index + 1
 
 	if idx >= len(s.data) {
@@ -26,7 +26,7 @@ func (s *stack[T]) push(v T) {
 	s.index++
 }
 
-func (s *stack[T]) pop() (v T) {
+func (s *Stack[T]) Pop() (v T) {
 	if len(s.data) == 0 {
 		return
 	}
@@ -36,7 +36,7 @@ func (s *stack[T]) pop() (v T) {
 	return v
 }
 
-func (s *stack[T]) peek() (v T) {
+func (s *Stack[T]) Peek() (v T) {
 	if len(s.data) == 0 {
 		return
 	}
@@ -44,6 +44,6 @@ func (s *stack[T]) peek() (v T) {
 	return s.data[s.index]
 }
 
-func (s stack[T]) String() string {
+func (s Stack[T]) String() string {
 	return fmt.Sprintf("%v", s.data[:s.index+1])
 }

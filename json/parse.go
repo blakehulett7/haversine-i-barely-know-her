@@ -3,6 +3,7 @@ package json
 import (
 	"fmt"
 	"haversine-i-barely-know-her/metrics"
+	"haversine-i-barely-know-her/stack"
 	"reflect"
 	"strconv"
 	"time"
@@ -29,7 +30,7 @@ func Parse(dest any, data []byte) error {
 	}
 
 	parser := newParser()
-	parser.dest_stack.push(v.Elem())
+	parser.dest_stack.Push(v.Elem())
 	for _, t := range tokens {
 		// fmt.Println(parser.status, parser.key_stack, parser.status_stack, t)
 		err = parser.read(t)
@@ -49,9 +50,9 @@ type parser struct {
 	valid_close bool
 	valid_open  bool
 
-	dest_stack   stack[reflect.Value]
-	key_stack    stack[string]
-	status_stack stack[parser_status]
+	dest_stack   stack.Stack[reflect.Value]
+	key_stack    stack.Stack[string]
+	status_stack stack.Stack[parser_status]
 
 	final any
 	dest  reflect.Value
@@ -60,9 +61,9 @@ type parser struct {
 func newParser() *parser {
 	return &parser{
 		status:       parse_value,
-		dest_stack:   newStack[reflect.Value](),
-		key_stack:    newStack[string](),
-		status_stack: newStack[parser_status](),
+		dest_stack:   stack.New[reflect.Value](),
+		key_stack:    stack.New[string](),
+		status_stack: stack.New[parser_status](),
 	}
 }
 
@@ -96,13 +97,13 @@ func (p *parser) read_array(t token) error {
 	case "end":
 	case "start":
 		if t.value == "object" {
-			p.status_stack.push(parse_array)
+			p.status_stack.Push(parse_array)
 			p.status = parse_object
 
-			dest := p.dest_stack.peek()
+			dest := p.dest_stack.Peek()
 
 			obj := reflect.New(dest.Type().Elem()).Elem()
-			p.dest_stack.push(obj)
+			p.dest_stack.Push(obj)
 			return nil
 		}
 
@@ -119,7 +120,7 @@ func (p *parser) read_key(t token) error {
 	}
 	p.status = parse_value
 
-	dest := p.dest_stack.peek()
+	dest := p.dest_stack.Peek()
 
 	if dest.Kind() != reflect.Struct {
 		return fmt.Errorf("invalid parser status, must be in a struct to read a key")
@@ -134,8 +135,8 @@ func (p *parser) read_object(t token) error {
 		return fmt.Errorf("invalid json: expected key but got %v", t)
 	case "string":
 		key := cases.Title(language.English).String(t.value)
-		p.key_stack.push(key)
-		p.status_stack.push(parse_object)
+		p.key_stack.Push(key)
+		p.status_stack.Push(parse_object)
 		p.status = parse_key
 		return nil
 	}
@@ -147,13 +148,13 @@ func (p *parser) read_value(t token) error {
 		return fmt.Errorf("invalid json: unexpected token %v", t)
 	case "end":
 
-		obj := p.dest_stack.pop()
+		obj := p.dest_stack.Pop()
 
-		p.key_stack.pop()
-		p.status_stack.pop()
-		p.status = p.status_stack.pop()
+		p.key_stack.Pop()
+		p.status_stack.Pop()
+		p.status = p.status_stack.Pop()
 
-		dest := p.dest_stack.peek()
+		dest := p.dest_stack.Peek()
 		dest.Set(reflect.Append(dest, obj))
 
 	case "control":
@@ -162,35 +163,35 @@ func (p *parser) read_value(t token) error {
 			return fmt.Errorf("invalid json: unexpected :")
 		}
 
-		p.key_stack.pop()
-		p.status = p.status_stack.pop()
+		p.key_stack.Pop()
+		p.status = p.status_stack.Pop()
 
 	case "start":
 		if t.value == "object" {
-			p.status_stack.push(p.status)
+			p.status_stack.Push(p.status)
 			p.status = parse_object
 			return nil
 		}
 
 		if t.value == "array" {
-			p.status_stack.push(p.status)
+			p.status_stack.Push(p.status)
 			p.status = parse_array
 
-			key := p.key_stack.peek()
-			dest := p.dest_stack.peek()
+			key := p.key_stack.Peek()
+			dest := p.dest_stack.Peek()
 			field := dest.FieldByName(key)
 
 			if field.Kind() != reflect.Slice {
 				return fmt.Errorf("invalid parser status, must be in a slice to read an array")
 			}
 
-			p.dest_stack.push(field)
+			p.dest_stack.Push(field)
 			return nil
 		}
 
 	case "float":
-		key := p.key_stack.peek()
-		dest := p.dest_stack.peek()
+		key := p.key_stack.Peek()
+		dest := p.dest_stack.Peek()
 		field := dest.FieldByName(key)
 
 		f, err := strconv.ParseFloat(t.value, 64)

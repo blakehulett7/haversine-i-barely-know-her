@@ -28,7 +28,8 @@ func (l Label) String() string {
 type Metrics [3]Metric
 
 type Metric struct {
-	Duration time.Duration
-	Hits     int
+	Start    bool
 	Label    Label
+	Hits     int
+	Duration time.Duration
 }

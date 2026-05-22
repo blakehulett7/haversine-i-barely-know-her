@@ -15,6 +15,11 @@ func NewMetrics() chan bool {
 		var metrics Metrics
 
 		for metric := range MetricsChan {
+			if metric.Start {
+
+				continue
+			}
+
 			metrics[metric.Label].Duration += metric.Duration
 			metrics[metric.Label].Hits++
 			metrics[metric.Label].Label = metric.Label
@@ -28,10 +33,18 @@ func NewMetrics() chan bool {
 	return metrics_done
 }
 
+func Start(label Label) time.Time {
+	MetricsChan <- Metric{
+		Start: true,
+		Label: label,
+	}
+	return time.Now()
+}
+
 func ReportMetrics(start time.Time, label Label) {
 	MetricsChan <- Metric{
-		Duration: time.Since(start),
 		Label:    label,
+		Duration: time.Since(start),
 	}
 }
 
