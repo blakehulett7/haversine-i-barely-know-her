@@ -47,7 +47,7 @@ func Start(label Label) time.Time {
 	return time.Now()
 }
 
-func ReportMetrics(start time.Time, label Label) {
+func End(start time.Time, label Label) {
 	MetricsChan <- Metric{
 		Label:    label,
 		Duration: time.Since(start),
@@ -62,11 +62,14 @@ func print_metrics(metrics Metrics, total_elapsed time.Duration) {
 			continue
 		}
 
-		fmt.Printf("\t%s[%d]: Time: %d (%.2f%%)", metric.Label, metric.Hits, metric.Duration, asPercent(metric.Duration, total_elapsed))
+		fmt.Printf("\t%s[%d]: Time: %d ", metric.Label, metric.Hits, metric.Duration)
+		metric.ExlusiveDuration = metric.Duration - metrics[metric.Child].Duration
+
+		fmt.Printf("(%.2f%%", asPercent(metric.ExlusiveDuration, total_elapsed))
 		if metric.Child != 0 {
-			fmt.Printf(", Child: %s", metric.Child)
+			fmt.Printf(", %.2f%% w/children", asPercent(metric.Duration, total_elapsed))
 		}
-		fmt.Println()
+		fmt.Println(")")
 	}
 }
 

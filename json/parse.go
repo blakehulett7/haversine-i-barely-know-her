@@ -13,7 +13,7 @@ import (
 
 func Parse(dest any, data []byte) error {
 	start := metrics.Start(metrics.ParseJSON)
-	defer metrics.ReportMetrics(start, metrics.ParseJSON)
+	defer metrics.End(start, metrics.ParseJSON)
 
 	v := reflect.ValueOf(dest)
 	if v.Kind() != reflect.Pointer {
