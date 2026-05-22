@@ -34,3 +34,14 @@ func radiansFromDegrees(degrees float64) float64 {
 func square(a float64) float64 {
 	return a * a
 }
+
+func RecursiveHaversine(pairs []Row, idx int) f64 {
+	if idx == len(pairs) {
+		return 0
+	}
+
+	ans := ReferenceHaversine(pairs[idx])
+	idx++
+
+	return ans + RecursiveHaversine(pairs, idx)
+}

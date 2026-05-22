@@ -44,11 +44,13 @@ func main() {
 	var rolling_sum float64
 	answers := []float64{}
 
-	for _, pair := range input.Pairs {
-		haversine := ReferenceHaversine(pair)
-		answers = append(answers, haversine)
-		rolling_sum += haversine
-	}
+	rolling_sum = RecursiveHaversine(input.Pairs, 0)
+
+	// for _, pair := range input.Pairs {
+	// 	haversine := ReferenceHaversine(pair)
+	// 	answers = append(answers, haversine)
+	// 	rolling_sum += haversine
+	// }
 
 	avg := rolling_sum / float64(len(input.Pairs))
 
