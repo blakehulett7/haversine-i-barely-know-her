@@ -55,14 +55,14 @@ func End(start time.Time, label Label) {
 }
 
 func print_metrics(metrics Metrics, total_elapsed time.Duration) {
-	fmt.Printf("Total Time: %d\n", total_elapsed)
+	fmt.Printf("Total Time: %dms\n", total_elapsed.Milliseconds())
 
 	for i, metric := range metrics {
 		if i == 0 {
 			continue
 		}
 
-		fmt.Printf("\t%s[%d]: Time: %d ", metric.Label, metric.Hits, metric.Duration)
+		fmt.Printf("\t%s[%d]: Time: %dms ", metric.Label, metric.Hits, metric.Duration.Milliseconds())
 		metric.ExlusiveDuration = metric.Duration - metrics[metric.Child].Duration
 
 		fmt.Printf("(%.2f%%", asPercent(metric.ExlusiveDuration, total_elapsed))
