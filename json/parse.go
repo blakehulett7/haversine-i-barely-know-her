@@ -2,6 +2,7 @@ package json
 
 import (
 	"fmt"
+	"haversine-i-barely-know-her/metrics"
 	"reflect"
 	"strconv"
 	"time"
@@ -12,11 +13,7 @@ import (
 
 func Parse(dest any, data []byte) error {
 	start := time.Now()
-	defer func() {
-		end := time.Now()
-		elapsed := end.Sub(start)
-		fmt.Println(elapsed)
-	}()
+	defer metrics.ReportMetrics(start, metrics.ParseJSON)
 
 	v := reflect.ValueOf(dest)
 	if v.Kind() != reflect.Pointer {

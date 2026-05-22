@@ -1,8 +1,15 @@
 package main
 
-import "math"
+import (
+	"haversine-i-barely-know-her/metrics"
+	"math"
+	"time"
+)
 
 func ReferenceHaversine(pair Row) float64 {
+	start := time.Now()
+	defer metrics.ReportMetrics(start, metrics.ReferenceHaversine)
+
 	lat1 := pair.Y0
 	lat2 := pair.Y1
 	lon1 := pair.X0
