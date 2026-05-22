@@ -35,7 +35,7 @@ func NewMetrics() chan bool {
 
 			parents.Pop()
 			parent := parents.Peek()
-			metrics[parent].Child = metric.Label
+			metrics[parent].ChildDuration += metric.Duration
 
 			metrics[metric.Label].Label = metric.Label
 			metrics[metric.Label].Duration += metric.Duration
@@ -76,10 +76,10 @@ func print_metrics(metrics Metrics, total_elapsed time.Duration) {
 		}
 
 		fmt.Printf("\t%s[%d]: Time: %dms ", metric.Label, metric.Hits, metric.Duration.Milliseconds())
-		metric.ExlusiveDuration = metric.Duration - metrics[metric.Child].Duration
+		metric.ExlusiveDuration = metric.Duration - metric.ChildDuration
 
 		fmt.Printf("(%.2f%%", asPercent(metric.ExlusiveDuration, total_elapsed))
-		if metric.Child != 0 {
+		if metric.ChildDuration != 0 {
 			fmt.Printf(", %.2f%% w/children", asPercent(metric.Duration, total_elapsed))
 		}
 		fmt.Println(")")

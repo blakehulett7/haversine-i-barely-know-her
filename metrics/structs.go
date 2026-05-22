@@ -33,9 +33,9 @@ type Metrics [4]Metric
 type Metric struct {
 	Start            bool
 	Label            Label
-	Child            Label
 	Hits             int
 	Nested           int
+	ChildDuration    time.Duration
 	ExlusiveDuration time.Duration
 	Duration         time.Duration
 }
