@@ -72,7 +72,6 @@ func print_metrics(metrics Metrics, total_elapsed time.Duration) {
 			fmt.Printf(", %.2f%% w/children", asPercent(metric.InclusiveDuration, total_elapsed))
 		}
 		fmt.Println(")")
-		fmt.Printf("I am %s and my parent is %s\n", metric.Label, metric.Parent)
 	}
 }
 

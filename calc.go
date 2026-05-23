@@ -6,8 +6,8 @@ import (
 )
 
 func ReferenceHaversine(pair Row) float64 {
-	// start := metrics.Start(metrics.ReferenceHaversine)
-	// defer metrics.End(start, metrics.ReferenceHaversine)
+	start := metrics.Start(metrics.ReferenceHaversine)
+	defer metrics.End(start, metrics.ReferenceHaversine)
 
 	lat1 := pair.Y0
 	lat2 := pair.Y1
