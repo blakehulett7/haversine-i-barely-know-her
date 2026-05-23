@@ -12,8 +12,8 @@ type clean_lexer interface {
 }
 
 func lex_runes_cleanly(runes []rune) ([]token, error) {
-	start := metrics.Start(metrics.LexJSON)
-	defer metrics.End(start, metrics.LexJSON)
+	start := metrics.Start(metrics.LexJSONClean)
+	defer metrics.End(start, metrics.LexJSONClean)
 
 	var lexer clean_lexer = normal_lexer{}
 	var err error
