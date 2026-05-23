@@ -33,15 +33,11 @@ func Parse(dest any, data []byte) error {
 	parser := newParser()
 	parser.dest_stack.Push(v.Elem())
 	for _, t := range tokens {
-		// fmt.Println(parser.status, parser.key_stack, parser.status_stack, t)
 		err = parser.read(t)
-
 		if err != nil {
 			return err
 		}
 	}
-
-	// fmt.Println()
 
 	return nil
 }
