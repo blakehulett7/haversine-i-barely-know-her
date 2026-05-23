@@ -50,7 +50,7 @@ func main() {
 	// 	haversine := ReferenceHaversine(pair)
 	// 	answers = append(answers, haversine)
 	// 	rolling_sum += haversine
-	// }
+	//    }
 
 	avg := rolling_sum / float64(len(input.Pairs))
 

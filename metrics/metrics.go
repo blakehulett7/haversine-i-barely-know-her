@@ -2,46 +2,32 @@ package metrics
 
 import (
 	"fmt"
-	"haversine-i-barely-know-her/stack"
 	"time"
 )
 
-var MetricsChan = make(chan Metric)
+var MetricsChan = make(chan Pace)
 
 func NewMetrics() chan bool {
 	metrics_done := make(chan bool)
 
 	go func() {
 		start := time.Now()
-		var metrics Metrics
-		parents := stack.New[Label]()
+		var global_parent Label
 
+		var metrics Metrics
 		for metric := range MetricsChan {
 			if metric.Start {
-				metrics[metric.Label].Nested++
-
-				if metrics[metric.Label].Nested > 1 {
-					continue
-				}
-
-				parents.Push(metric.Label)
+				metrics[metric.Label].Parent = global_parent
+				global_parent = metric.Label
+				metrics[metric.Label].RootDuration = metrics[metric.Label].InclusiveDuration
 				continue
 			}
 
-			if metrics[metric.Label].Nested > 1 {
-				metrics[metric.Label].Nested--
-				continue
-			}
-
-			parents.Pop()
-			parent := parents.Peek()
-			metrics[parent].ChildDuration += metric.Duration
-
-			metrics[metric.Label].Label = metric.Label
-			metrics[metric.Label].Duration += metric.Duration
-
+			metrics[metrics[metric.Label].Parent].ExclusiveDuration -= metric.Elapsed
+			metrics[metric.Label].ExclusiveDuration += metric.Elapsed
+			metrics[metric.Label].InclusiveDuration = metrics[metric.Label].RootDuration + metric.Elapsed
 			metrics[metric.Label].Hits++
-			metrics[metric.Label].Nested--
+			metrics[metric.Label].Label = metric.Label
 		}
 
 		total_elapsed := time.Since(start)
@@ -53,7 +39,7 @@ func NewMetrics() chan bool {
 }
 
 func Start(label Label) time.Time {
-	MetricsChan <- Metric{
+	MetricsChan <- Pace{
 		Start: true,
 		Label: label,
 	}
@@ -61,28 +47,32 @@ func Start(label Label) time.Time {
 }
 
 func End(start time.Time, label Label) {
-	MetricsChan <- Metric{
-		Label:    label,
-		Duration: time.Since(start),
+	MetricsChan <- Pace{
+		Label:   label,
+		Elapsed: time.Since(start),
 	}
 }
 
 func print_metrics(metrics Metrics, total_elapsed time.Duration) {
 	fmt.Printf("Total Time: %dms\n", total_elapsed.Milliseconds())
 
-	for i, metric := range metrics {
-		if i == 0 {
+	for _, metric := range metrics {
+		if metric.Label == 0 {
 			continue
 		}
 
-		fmt.Printf("\t%s[%d]: Time: %dms ", metric.Label, metric.Hits, metric.Duration.Milliseconds())
-		metric.ExlusiveDuration = metric.Duration - metric.ChildDuration
+		if metric.Label == metric.Parent {
+			metric.ExclusiveDuration = metric.InclusiveDuration
+		}
 
-		fmt.Printf("(%.2f%%", asPercent(metric.ExlusiveDuration, total_elapsed))
-		if metric.ChildDuration != 0 {
-			fmt.Printf(", %.2f%% w/children", asPercent(metric.Duration, total_elapsed))
+		fmt.Printf("\t%s[%d]: Time: %dms ", metric.Label, metric.Hits, metric.ExclusiveDuration.Milliseconds())
+
+		fmt.Printf("(%.2f%%", asPercent(metric.ExclusiveDuration, total_elapsed))
+		if metric.ExclusiveDuration != metric.InclusiveDuration {
+			fmt.Printf(", %.2f%% w/children", asPercent(metric.InclusiveDuration, total_elapsed))
 		}
 		fmt.Println(")")
+		fmt.Printf("I am %s and my parent is %s\n", metric.Label, metric.Parent)
 	}
 }
 

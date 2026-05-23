@@ -36,8 +36,22 @@ func square(a float64) float64 {
 }
 
 func RecursiveHaversine(pairs []Row, idx int) f64 {
-	start := metrics.Start(metrics.ReferenceHaversine)
-	defer metrics.End(start, metrics.ReferenceHaversine)
+	start := metrics.Start(metrics.RecursiveHaversine)
+	defer metrics.End(start, metrics.RecursiveHaversine)
+
+	if idx == len(pairs) {
+		return 0
+	}
+
+	ans := ReferenceHaversine(pairs[idx])
+	idx++
+
+	return ans + RecursiveHaversine(pairs, idx)
+}
+
+func PartnerHaversine(pairs []Row, idx int) f64 {
+	start := metrics.Start(metrics.PartnerHaversine)
+	defer metrics.End(start, metrics.PartnerHaversine)
 
 	if idx == len(pairs) {
 		return 0

@@ -13,6 +13,8 @@ const (
 	ParseJSON Label = iota + 1
 	LexJSON
 	ReferenceHaversine
+	RecursiveHaversine
+	PartnerHaversine
 )
 
 func (l Label) String() string {
@@ -25,17 +27,26 @@ func (l Label) String() string {
 		return "ReferenceHaversine"
 	case LexJSON:
 		return "json.lex"
+	case RecursiveHaversine:
+		return "RecursiveHaversine"
+	case PartnerHaversine:
+		return "PartnerHaversine"
 	}
 }
 
-type Metrics [4]Metric
+type Metrics [6]Metric
 
 type Metric struct {
-	Start            bool
-	Label            Label
-	Hits             int
-	Nested           int
-	ChildDuration    time.Duration
-	ExlusiveDuration time.Duration
-	Duration         time.Duration
+	Label             Label
+	Parent            Label
+	Hits              int
+	ExclusiveDuration time.Duration
+	InclusiveDuration time.Duration
+	RootDuration      time.Duration
+}
+
+type Pace struct {
+	Start   bool
+	Label   Label
+	Elapsed time.Duration
 }
