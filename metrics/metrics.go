@@ -28,6 +28,8 @@ func NewMetrics(on bool) chan bool {
 			metrics[metric.Label].InclusiveDuration = metrics[metric.Label].RootDuration + metric.Elapsed
 			metrics[metric.Label].Hits++
 			metrics[metric.Label].Label = metric.Label
+
+			global_parent = metrics[metric.Label].Parent
 		}
 
 		total_elapsed := time.Since(start)
