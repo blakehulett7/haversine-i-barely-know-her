@@ -7,7 +7,7 @@ import (
 
 var MetricsChan = make(chan Pace)
 
-func NewMetrics() chan bool {
+func NewMetrics(on bool) chan bool {
 	metrics_done := make(chan bool)
 
 	go func() {
@@ -73,6 +73,8 @@ func print_metrics(metrics Metrics, total_elapsed time.Duration) {
 		}
 		fmt.Println(")")
 	}
+
+	fmt.Println()
 }
 
 func estimateCPUFrequency() u64 {

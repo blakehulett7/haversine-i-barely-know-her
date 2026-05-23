@@ -22,11 +22,13 @@ type Row struct {
 const EarthRadius = 6372.8
 
 func main() {
-	metrics_done := metrics.NewMetrics()
+	metrics_done := metrics.NewMetrics(false)
 	defer func() {
 		close(metrics.MetricsChan)
 		<-metrics_done
 	}()
+
+	fmt.Println()
 
 	data, err := os.ReadFile("./points_1000000.json")
 	if err != nil {
@@ -46,11 +48,13 @@ func main() {
 
 	// rolling_sum = RecursiveHaversine(input.Pairs, 0)
 
+	start := metrics.Start(metrics.ReferenceHaversine)
 	for _, pair := range input.Pairs {
 		haversine := ReferenceHaversine(pair)
 		answers = append(answers, haversine)
 		rolling_sum += haversine
 	}
+	metrics.End(start, metrics.ReferenceHaversine)
 
 	avg := rolling_sum / float64(len(input.Pairs))
 

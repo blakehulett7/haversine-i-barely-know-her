@@ -2,39 +2,24 @@ package metrics
 
 import "time"
 
-type enum = u8
+type enum = byte
 type f64 = float64
 type u8 = uint8
 type u64 = uint64
 
 type Label enum
 
+//go:generate stringer -type=Label -output=enum_strings.go
 const (
 	ParseJSON Label = iota + 1
 	LexJSON
+	LexJSONClean
 	ReferenceHaversine
 	RecursiveHaversine
 	PartnerHaversine
 )
 
-func (l Label) String() string {
-	switch l {
-	default:
-		return "invalid label"
-	case ParseJSON:
-		return "json.Parse"
-	case ReferenceHaversine:
-		return "ReferenceHaversine"
-	case LexJSON:
-		return "json.lex"
-	case RecursiveHaversine:
-		return "RecursiveHaversine"
-	case PartnerHaversine:
-		return "PartnerHaversine"
-	}
-}
-
-type Metrics [6]Metric
+type Metrics [7]Metric
 
 type Metric struct {
 	Label             Label

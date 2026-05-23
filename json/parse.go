@@ -23,7 +23,9 @@ func Parse(dest any, data []byte) error {
 	s := string(data)
 	runes := []rune(s)
 
+	// tokens, err := lex_runes_cleanly(runes)
 	tokens, err := lexRunes(runes)
+
 	if err != nil {
 		return err
 	}
