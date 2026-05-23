@@ -68,7 +68,7 @@ func print_metrics(metrics Metrics, total_elapsed time.Duration) {
 		fmt.Printf("\t%s[%d]: Time: %dms ", metric.Label, metric.Hits, metric.ExclusiveDuration.Milliseconds())
 
 		fmt.Printf("(%.2f%%", asPercent(metric.ExclusiveDuration, total_elapsed))
-		if metric.ExclusiveDuration != metric.InclusiveDuration {
+		if metric.ExclusiveDuration.Milliseconds() != metric.InclusiveDuration.Milliseconds() {
 			fmt.Printf(", %.2f%% w/children", asPercent(metric.InclusiveDuration, total_elapsed))
 		}
 		fmt.Println(")")
