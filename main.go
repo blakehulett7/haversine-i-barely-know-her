@@ -31,11 +31,13 @@ func main() {
 
 	fmt.Println()
 
-	data, err := os.ReadFile("./points_1000000.json")
+	start := metrics.Start(metrics.ReadFile)
+	data, err := os.ReadFile("./points_5000000.json")
 	if err != nil {
 		fmt.Println("could not open json file")
 		os.Exit(1)
 	}
+	metrics.End(start, uint64(len(data)), metrics.ReadFile)
 
 	var input Data
 	err = json.Parse(&input, data)
@@ -51,7 +53,7 @@ func main() {
 
 	sizeof_pairs := uintptr(len(input.Pairs)) * unsafe.Sizeof(Row{})
 
-	start := metrics.Start(metrics.ReferenceHaversine)
+	start = metrics.Start(metrics.ReferenceHaversine)
 	for _, pair := range input.Pairs {
 		haversine := ReferenceHaversine(pair)
 		answers = append(answers, haversine)

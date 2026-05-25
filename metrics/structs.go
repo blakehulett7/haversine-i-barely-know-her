@@ -17,9 +17,10 @@ const (
 	ReferenceHaversine
 	RecursiveHaversine
 	PartnerHaversine
+	ReadFile
 )
 
-type Metrics [7]Metric
+type Metrics [8]Metric
 
 type Metric struct {
 	Label             Label

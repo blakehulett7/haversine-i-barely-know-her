@@ -14,11 +14,12 @@ func _() {
 	_ = x[ReferenceHaversine-4]
 	_ = x[RecursiveHaversine-5]
 	_ = x[PartnerHaversine-6]
+	_ = x[ReadFile-7]
 }
 
-const _Label_name = "ParseJSONLexJSONLexJSONCleanReferenceHaversineRecursiveHaversinePartnerHaversine"
+const _Label_name = "ParseJSONLexJSONLexJSONCleanReferenceHaversineRecursiveHaversinePartnerHaversineReadFile"
 
-var _Label_index = [...]uint8{0, 9, 16, 28, 46, 64, 80}
+var _Label_index = [...]uint8{0, 9, 16, 28, 46, 64, 80, 88}
 
 func (i Label) String() string {
 	idx := int(i) - 1

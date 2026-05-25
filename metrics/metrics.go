@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+const MB = 1 << 20
+const GB = 1 << 30
+
 var MetricsChan = make(chan Pace)
 
 func NewMetrics(on bool) chan bool {
@@ -70,13 +73,23 @@ func print_metrics(metrics Metrics, total_elapsed time.Duration) {
 			metric.ExclusiveDuration = metric.InclusiveDuration
 		}
 
-		fmt.Printf("\t%s[%d]: Time: %dms ", metric.Label, metric.Hits, metric.ExclusiveDuration.Milliseconds())
+		block := fmt.Sprintf("%s[%d]:", metric.Label, metric.Hits)
+		fmt.Printf("\t%-24sTime: %dms ", block, metric.ExclusiveDuration.Milliseconds())
 
 		fmt.Printf("(%.2f%%", asPercent(metric.ExclusiveDuration, total_elapsed))
 		if metric.ExclusiveDuration.Milliseconds() != metric.InclusiveDuration.Milliseconds() {
 			fmt.Printf(", %.2f%% w/children", asPercent(metric.InclusiveDuration, total_elapsed))
 		}
-		fmt.Println(")")
+		fmt.Print(")")
+
+		if metric.BytesProcessed > 0 {
+			megabytes := f64(metric.BytesProcessed) / f64(MB)
+			bytes_per_second := f64(metric.BytesProcessed) / metric.InclusiveDuration.Seconds()
+			gigabytes_per_second := bytes_per_second / f64(GB)
+			fmt.Printf("\t%.3fmb at %.2fgb/s", megabytes, gigabytes_per_second)
+		}
+
+		fmt.Println()
 	}
 
 	fmt.Println()
