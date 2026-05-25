@@ -21,7 +21,7 @@ func newLexer() lexer {
 
 func lexRunes(runes []rune) ([]token, error) {
 	start := metrics.Start(metrics.LexJSON)
-	defer metrics.End(start, metrics.LexJSON)
+	defer metrics.End(start, uint64(len(runes)*4), metrics.LexJSON)
 
 	lexer := newLexer()
 

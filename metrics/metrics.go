@@ -24,10 +24,12 @@ func NewMetrics(on bool) chan bool {
 			}
 
 			metrics[metrics[metric.Label].Parent].ExclusiveDuration -= metric.Elapsed
+
 			metrics[metric.Label].ExclusiveDuration += metric.Elapsed
 			metrics[metric.Label].InclusiveDuration = metrics[metric.Label].RootDuration + metric.Elapsed
 			metrics[metric.Label].Hits++
 			metrics[metric.Label].Label = metric.Label
+			metrics[metric.Label].BytesProcessed += metric.ByteCount
 
 			global_parent = metrics[metric.Label].Parent
 		}
@@ -48,10 +50,11 @@ func Start(label Label) time.Time {
 	return time.Now()
 }
 
-func End(start time.Time, label Label) {
+func End(start time.Time, bytes uint64, label Label) {
 	MetricsChan <- Pace{
-		Label:   label,
-		Elapsed: time.Since(start),
+		Label:     label,
+		Elapsed:   time.Since(start),
+		ByteCount: bytes,
 	}
 }
 

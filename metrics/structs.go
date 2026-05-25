@@ -28,10 +28,12 @@ type Metric struct {
 	ExclusiveDuration time.Duration
 	InclusiveDuration time.Duration
 	RootDuration      time.Duration
+	BytesProcessed    u64
 }
 
 type Pace struct {
-	Start   bool
-	Label   Label
-	Elapsed time.Duration
+	Start     bool
+	Label     Label
+	Elapsed   time.Duration
+	ByteCount u64
 }

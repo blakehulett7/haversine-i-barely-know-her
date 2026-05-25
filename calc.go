@@ -3,6 +3,7 @@ package main
 import (
 	"haversine-i-barely-know-her/metrics"
 	"math"
+	"unsafe"
 )
 
 func ReferenceHaversine(pair Row) float64 {
@@ -33,8 +34,10 @@ func square(a float64) float64 {
 }
 
 func RecursiveHaversine(pairs []Row, idx int) f64 {
+	sizeof_pairs := uintptr(len(pairs)) * unsafe.Sizeof(Row{})
+
 	start := metrics.Start(metrics.RecursiveHaversine)
-	defer metrics.End(start, metrics.RecursiveHaversine)
+	defer metrics.End(start, uint64(sizeof_pairs), metrics.RecursiveHaversine)
 
 	if idx == len(pairs) {
 		return 0
@@ -47,8 +50,10 @@ func RecursiveHaversine(pairs []Row, idx int) f64 {
 }
 
 func PartnerHaversine(pairs []Row, idx int) f64 {
+	sizeof_pairs := uintptr(len(pairs)) * unsafe.Sizeof(Row{})
+
 	start := metrics.Start(metrics.PartnerHaversine)
-	defer metrics.End(start, metrics.PartnerHaversine)
+	defer metrics.End(start, uint64(sizeof_pairs), metrics.PartnerHaversine)
 
 	if idx == len(pairs) {
 		return 0

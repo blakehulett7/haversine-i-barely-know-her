@@ -6,6 +6,7 @@ import (
 	"haversine-i-barely-know-her/json"
 	"haversine-i-barely-know-her/metrics"
 	"os"
+	"unsafe"
 )
 
 type Data struct {
@@ -48,13 +49,15 @@ func main() {
 
 	// rolling_sum = RecursiveHaversine(input.Pairs, 0)
 
+	sizeof_pairs := uintptr(len(input.Pairs)) * unsafe.Sizeof(Row{})
+
 	start := metrics.Start(metrics.ReferenceHaversine)
 	for _, pair := range input.Pairs {
 		haversine := ReferenceHaversine(pair)
 		answers = append(answers, haversine)
 		rolling_sum += haversine
 	}
-	metrics.End(start, metrics.ReferenceHaversine)
+	metrics.End(start, uint64(sizeof_pairs), metrics.ReferenceHaversine)
 
 	avg := rolling_sum / float64(len(input.Pairs))
 
