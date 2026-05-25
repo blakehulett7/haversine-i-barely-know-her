@@ -32,7 +32,7 @@ func main() {
 	fmt.Println()
 
 	start := metrics.Start(metrics.ReadFile)
-	data, err := os.ReadFile("./points_5000000.json")
+	data, err := os.ReadFile("./points_1000000.json")
 	if err != nil {
 		fmt.Println("could not open json file")
 		os.Exit(1)
