@@ -33,11 +33,11 @@ func main() {
 
 	start := metrics.Start(metrics.ReadFile)
 	data, err := os.ReadFile("./points_1000000.json")
+	metrics.End(start, uint64(len(data)), metrics.ReadFile)
 	if err != nil {
 		fmt.Println("could not open json file")
 		os.Exit(1)
 	}
-	metrics.End(start, uint64(len(data)), metrics.ReadFile)
 
 	var input Data
 	err = json.Parse(&input, data)
