@@ -58,7 +58,7 @@ func main() {
 				os.Exit(1)
 			}
 
-			// NOTE: This forces a minor page fault
+			// NOTE: This forces a minor page fault... allegedly
 			syscall.Syscall(syscall.SYS_MADVISE, uintptr(unsafe.Pointer(&data[0])), uintptr(len(data)), uintptr(syscall.MADV_DONTNEED))
 
 			if done {
