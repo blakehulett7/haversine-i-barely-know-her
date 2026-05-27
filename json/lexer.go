@@ -19,11 +19,19 @@ func newLexer() lexer {
 	}
 }
 
+func new_and_improved_lexer() lexer {
+	return lexer{
+		status: lexer_normal,
+		buffer: make([]rune, 0, 16),
+	}
+}
+
 func lexRunes(runes []rune) ([]token, error) {
 	start := metrics.Start(metrics.LexJSON)
 	defer metrics.End(start, uint64(len(runes)*4), metrics.LexJSON)
 
 	lexer := newLexer()
+	// lexer := new_and_improved_lexer()
 
 	for _, r := range runes {
 		var err error

@@ -39,6 +39,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	json.QuickParse(data, 1000000)
+
 	var input Data
 	err = json.Parse(&input, data)
 	if err != nil {
