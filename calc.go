@@ -2,11 +2,12 @@ package main
 
 import (
 	"haversine-i-barely-know-her/metrics"
+	"haversine-i-barely-know-her/models"
 	"math"
 	"unsafe"
 )
 
-func ReferenceHaversine(pair Row) float64 {
+func ReferenceHaversine(pair models.Row) float64 {
 	lat1 := pair.Y0
 	lat2 := pair.Y1
 	lon1 := pair.X0
@@ -33,7 +34,7 @@ func square(a float64) float64 {
 	return a * a
 }
 
-func RecursiveHaversine(pairs []Row, idx int) f64 {
+func RecursiveHaversine(pairs []models.Row, idx int) f64 {
 	sizeof_pairs := uintptr(len(pairs)) * unsafe.Sizeof(Row{})
 
 	start := metrics.Start(metrics.RecursiveHaversine)
@@ -49,7 +50,7 @@ func RecursiveHaversine(pairs []Row, idx int) f64 {
 	return ans + RecursiveHaversine(pairs, idx)
 }
 
-func PartnerHaversine(pairs []Row, idx int) f64 {
+func PartnerHaversine(pairs []models.Row, idx int) f64 {
 	sizeof_pairs := uintptr(len(pairs)) * unsafe.Sizeof(Row{})
 
 	start := metrics.Start(metrics.PartnerHaversine)

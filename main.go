@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"haversine-i-barely-know-her/json"
 	"haversine-i-barely-know-her/metrics"
+	"haversine-i-barely-know-her/models"
 	"os"
 	"unsafe"
 )
 
 type Data struct {
-	Pairs []Row `json:"pairs"`
+	Pairs []models.Row `json:"pairs"`
 }
 
 type Row struct {
@@ -39,10 +40,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	json.QuickParse(data, 1000000)
-
 	var input Data
-	err = json.Parse(&input, data)
+	input.Pairs = json.QuickParse(data, 1000000)
+	// err = json.Parse(&input, data)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

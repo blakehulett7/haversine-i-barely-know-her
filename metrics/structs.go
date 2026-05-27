@@ -12,6 +12,7 @@ type Label enum
 //go:generate stringer -type=Label -output=enum_strings.go
 const (
 	ParseJSON Label = iota + 1
+	QuickParse
 	LexJSON
 	LexJSONClean
 	ReferenceHaversine
@@ -20,7 +21,7 @@ const (
 	ReadFile
 )
 
-type Metrics [8]Metric
+type Metrics [9]Metric
 
 type Metric struct {
 	Label             Label

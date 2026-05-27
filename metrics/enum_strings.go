@@ -9,17 +9,18 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[ParseJSON-1]
-	_ = x[LexJSON-2]
-	_ = x[LexJSONClean-3]
-	_ = x[ReferenceHaversine-4]
-	_ = x[RecursiveHaversine-5]
-	_ = x[PartnerHaversine-6]
-	_ = x[ReadFile-7]
+	_ = x[QuickParse-2]
+	_ = x[LexJSON-3]
+	_ = x[LexJSONClean-4]
+	_ = x[ReferenceHaversine-5]
+	_ = x[RecursiveHaversine-6]
+	_ = x[PartnerHaversine-7]
+	_ = x[ReadFile-8]
 }
 
-const _Label_name = "ParseJSONLexJSONLexJSONCleanReferenceHaversineRecursiveHaversinePartnerHaversineReadFile"
+const _Label_name = "ParseJSONQuickParseLexJSONLexJSONCleanReferenceHaversineRecursiveHaversinePartnerHaversineReadFile"
 
-var _Label_index = [...]uint8{0, 9, 16, 28, 46, 64, 80, 88}
+var _Label_index = [...]uint8{0, 9, 19, 26, 38, 56, 74, 90, 98}
 
 func (i Label) String() string {
 	idx := int(i) - 1
