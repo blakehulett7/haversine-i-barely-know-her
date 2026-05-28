@@ -19,10 +19,10 @@ func QuickParse(data []byte, size int) []models.Row {
 	s := string(data)
 	runes := []rune(s)
 
-	chunks := chunk_runes(runes)
-	fmt.Println(string(chunks[9]))
-	fmt.Println(len(runes))
-	fmt.Println(len(chunks[9]))
+	chunks := chunk_runes(runes[14:])
+	for _, chunk := range chunks {
+		print_runes(chunk[0:10])
+	}
 
 	cursor := find_next(runes, 0, ':')
 	cursor++
