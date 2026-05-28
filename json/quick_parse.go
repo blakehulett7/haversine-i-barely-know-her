@@ -76,12 +76,21 @@ func parse_row(runes []rune, cursor int) (models.Row, int) {
 
 func chunk_runes(runes []rune) [threads][]rune {
 	var chunks [threads][]rune
-	size := len(runes) / threads
+	rune_length := len(runes)
+
+	size := rune_length / threads
+	start := 0
 
 	for i := range threads {
-		end := size * (i + 1)
+		end := start + size
+		end = min(rune_length-2, end)
+
 		end = find_next(runes, end, '}')
-		chunks[i] = runes[size*i : end+1]
+		end++
+		end = min(rune_length, end)
+
+		chunks[i] = runes[start:end]
+		start = end
 	}
 
 	return chunks
