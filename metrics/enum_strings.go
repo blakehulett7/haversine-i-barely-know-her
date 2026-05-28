@@ -10,17 +10,18 @@ func _() {
 	var x [1]struct{}
 	_ = x[ParseJSON-1]
 	_ = x[QuickParse-2]
-	_ = x[LexJSON-3]
-	_ = x[LexJSONClean-4]
-	_ = x[ReferenceHaversine-5]
-	_ = x[RecursiveHaversine-6]
-	_ = x[PartnerHaversine-7]
-	_ = x[ReadFile-8]
+	_ = x[ParallelParse-3]
+	_ = x[LexJSON-4]
+	_ = x[LexJSONClean-5]
+	_ = x[ReferenceHaversine-6]
+	_ = x[RecursiveHaversine-7]
+	_ = x[PartnerHaversine-8]
+	_ = x[ReadFile-9]
 }
 
-const _Label_name = "ParseJSONQuickParseLexJSONLexJSONCleanReferenceHaversineRecursiveHaversinePartnerHaversineReadFile"
+const _Label_name = "ParseJSONQuickParseParallelParseLexJSONLexJSONCleanReferenceHaversineRecursiveHaversinePartnerHaversineReadFile"
 
-var _Label_index = [...]uint8{0, 9, 19, 26, 38, 56, 74, 90, 98}
+var _Label_index = [...]uint8{0, 9, 19, 32, 39, 51, 69, 87, 103, 111}
 
 func (i Label) String() string {
 	idx := int(i) - 1

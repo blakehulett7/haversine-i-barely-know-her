@@ -13,6 +13,7 @@ type Label enum
 const (
 	ParseJSON Label = iota + 1
 	QuickParse
+	ParallelParse
 	LexJSON
 	LexJSONClean
 	ReferenceHaversine
@@ -21,7 +22,7 @@ const (
 	ReadFile
 )
 
-type Metrics [9]Metric
+type Metrics [10]Metric
 
 type Metric struct {
 	Label             Label

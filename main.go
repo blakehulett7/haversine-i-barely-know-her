@@ -21,6 +21,7 @@ type Row struct {
 	Y1 float64 `json:"y1"`
 }
 
+const NumPoints = 1000000
 const EarthRadius = 6372.8
 
 func main() {
@@ -32,8 +33,10 @@ func main() {
 
 	fmt.Println()
 
+	path := fmt.Sprintf("./points_%d.json", NumPoints)
+
 	start := metrics.Start(metrics.ReadFile)
-	data, err := os.ReadFile("./points_1000000.json")
+	data, err := os.ReadFile(path)
 	metrics.End(start, uint64(len(data)), metrics.ReadFile)
 	if err != nil {
 		fmt.Println("could not open json file")
@@ -41,7 +44,8 @@ func main() {
 	}
 
 	var input Data
-	input.Pairs = json.QuickParse(data, 1000000)
+	input.Pairs = json.ParallelParse(data, NumPoints)
+	// input.Pairs = json.QuickParse(data, 1000000)
 	// err = json.Parse(&input, data)
 	if err != nil {
 		fmt.Println(err)
@@ -65,7 +69,7 @@ func main() {
 
 	avg := rolling_sum / float64(len(input.Pairs))
 
-	path := "out.f64"
+	path = "out.f64"
 	file, err := os.Create(path)
 	if err != nil {
 		fmt.Println("could not create answer file")

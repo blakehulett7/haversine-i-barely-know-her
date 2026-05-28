@@ -11,26 +11,36 @@ import (
 const row_size = 4
 const threads = 10
 
+func ParallelParse(data []byte, size int) []models.Row {
+	start := metrics.Start(metrics.ParallelParse)
+	defer metrics.End(start, uint64(len(data)), metrics.ParallelParse)
+
+	s := string(data)
+	runes := []rune(s)
+
+	collector, done := parse_parallel(size)
+	chunks := chunk_runes(runes[14:])
+	for i, chunk := range chunks {
+		go parse_chunk(collector, chunk, i)
+	}
+
+	rows := <-done
+	return rows
+}
+
 func QuickParse(data []byte, size int) []models.Row {
 	start := metrics.Start(metrics.QuickParse)
 	defer metrics.End(start, uint64(len(data)), metrics.QuickParse)
 
-	rows := make([]models.Row, size)
 	s := string(data)
 	runes := []rune(s)
-
-	chunks := chunk_runes(runes[14:])
-	for _, chunk := range chunks {
-		print_runes(chunk[0:10])
-	}
-
 	cursor := find_next(runes, 0, ':')
 	cursor++
 
+	rows := make([]models.Row, size)
 	for idx := range size {
 		rows[idx], cursor = parse_row(runes, cursor)
 	}
-
 	return rows
 }
 
@@ -41,6 +51,17 @@ func find_next(runes []rune, cursor int, target rune) int {
 		}
 		cursor++
 	}
+}
+
+func has_colon(runes []rune, cursor int) bool {
+	for cursor < len(runes) {
+		if runes[cursor] == ':' {
+			return true
+		}
+		cursor++
+	}
+
+	return false
 }
 
 func parse_row(runes []rune, cursor int) (models.Row, int) {
