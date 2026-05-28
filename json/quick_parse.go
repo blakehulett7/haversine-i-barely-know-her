@@ -6,7 +6,6 @@ import (
 	"haversine-i-barely-know-her/models"
 	"os"
 	"strconv"
-	"strings"
 )
 
 const row_size = 4
@@ -52,7 +51,7 @@ func parse_row(runes []rune, cursor int) (models.Row, int) {
 			end = find_next(runes, cursor, ',')
 		}
 
-		f, err := strconv.ParseFloat(strings.TrimSpace(string(runes[cursor:end])), 64)
+		f, err := strconv.ParseFloat(string(runes[cursor+1:end]), 64)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
