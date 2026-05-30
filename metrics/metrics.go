@@ -86,7 +86,7 @@ func print_metrics(metrics Metrics, total_elapsed time.Duration) {
 			megabytes := f64(metric.BytesProcessed) / f64(MB)
 			bytes_per_second := f64(metric.BytesProcessed) / metric.InclusiveDuration.Seconds()
 			gigabytes_per_second := bytes_per_second / f64(GB)
-			fmt.Printf("\t%.3fmb at %.2fgb/s", megabytes, gigabytes_per_second)
+			fmt.Printf("\t%.3fmb at %fgb/s", megabytes, gigabytes_per_second)
 		}
 
 		fmt.Println()
