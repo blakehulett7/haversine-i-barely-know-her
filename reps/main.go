@@ -11,32 +11,23 @@ import (
 const MB = 1 << 20
 const GB = 1 << 30
 
+const TestFor = 10 * time.Second
+
 func main() {
+	run_reps(func() int { return write_all(1024) }, "write_all")
+}
+
+func ReadingReps() {
 	for {
-		t := Tester{
-			test_for:  10 * time.Second,
-			run_timer: time.Now(),
-		}
-
-		fmt.Println()
-
-		fmt.Println("--- os.ReadFile ---")
-		for {
-			begin(&t)
+		run_reps(func() int {
 			data, err := os.ReadFile("../points_1000000.json")
-			done := end(&t, len(data))
-
-			if err != nil || len(data) == 0 {
-				fmt.Printf("failed test run, err: %v\n", err)
-				os.Exit(1)
+			if err != nil {
+				return 0
 			}
+			return len(data)
+		}, "os.ReadFile")
 
-			if done {
-				break
-			}
-		}
-
-		t = Tester{
+		t := Tester{
 			test_for:  10 * time.Second,
 			run_timer: time.Now(),
 		}

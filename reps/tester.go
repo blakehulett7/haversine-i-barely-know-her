@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type f64 = float64
 type u64 = uint64
@@ -26,5 +29,24 @@ type Tester struct {
 func New(test_for time.Duration) *Tester {
 	return &Tester{
 		test_for: test_for,
+	}
+}
+
+func run_reps(function func() int, label string) {
+	t := Tester{
+		test_for:  TestFor,
+		run_timer: time.Now(),
+	}
+
+	fmt.Println()
+	fmt.Printf("--- %s ---\n", label)
+	for {
+		begin(&t)
+		bytes_processed := function()
+		done := end(&t, bytes_processed)
+
+		if done {
+			break
+		}
 	}
 }
