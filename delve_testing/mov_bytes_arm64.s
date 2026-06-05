@@ -2,7 +2,7 @@
 
 // We use NOFRAME and NOSPLIT because the prologue, epilogue, and 
 // stack-split checks are explicitly handled within your instruction stream·
-TEXT ·mov_bytes(SB), NOSPLIT|NOFRAME, $0-0
+TEXT ·mov_bytes<ABIInternal>(SB), NOSPLIT|NOFRAME, $0-0
     
 start:
     MOVD 16(g), R16
