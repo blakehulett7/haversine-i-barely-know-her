@@ -95,7 +95,7 @@ func print_metrics(metrics Metrics, total_elapsed time.Duration) {
 	fmt.Println()
 }
 
-func estimateCPUFrequency() u64 {
+func EstimateCPUFrequency() u64 {
 	freq := getOSTimerFrequency()
 
 	var cpu_start u64 = readCPUTimer()

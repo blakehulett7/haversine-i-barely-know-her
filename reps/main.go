@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"haversine-i-barely-know-her/metrics"
 	"os"
 	"syscall"
 	"time"
@@ -13,7 +14,10 @@ const GB = 1 << 30
 
 const TestFor = 10 * time.Second
 
+var CPU_FREQ u64
+
 func main() {
+	CPU_FREQ = metrics.EstimateCPUFrequency() * 2 * 1000
 	run_reps(func() int { return write_all(1024) }, "write_all")
 }
 
@@ -99,8 +103,12 @@ func end(t *Tester, bytes_processed int) bool {
 func print_results(t *Tester) {
 	fmt.Printf("\t%fgb/s\n", gb_per_second(t.min_bytes_processed, t.Min))
 	fmt.Printf("Max: %-16s\t%fgb/s\n", fmt.Sprintf("%fms", f64(t.Max.Nanoseconds())/f64(time.Millisecond)), gb_per_second(t.max_bytes_processed, t.Max))
-	fmt.Printf("Avg: %-16s\t%fgb/s\n", fmt.Sprintf("%fms", f64(t.total_time.Milliseconds())/f64(t.test_count)), gb_per_second(t.bytes_processed, t.total_time))
+	fmt.Printf("Avg: %-16s\t%fgb/s\t%f cycles/byte\n", fmt.Sprintf("%fms", f64(t.total_time.Milliseconds())/f64(t.test_count)), gb_per_second(t.bytes_processed, t.total_time), cycles_per_byte(t.bytes_processed))
 	fmt.Println()
+}
+
+func cycles_per_byte(bytes_processed u64) f64 {
+	return f64(CPU_FREQ) / f64(bytes_processed)
 }
 
 func gb_per_second(bytes_processed u64, duration time.Duration) f64 {
