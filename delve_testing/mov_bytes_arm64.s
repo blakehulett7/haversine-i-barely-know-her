@@ -2,8 +2,14 @@
 
 // We use NOFRAME and NOSPLIT because the prologue, epilogue, and 
 // stack-split checks are explicitly handled within your instruction stream·
-TEXT ·mov_bytes<ABIInternal>(SB), NOSPLIT|NOFRAME, $0-0
+TEXT ·mov_bytes(SB), NOSPLIT|NOFRAME, $0-0
     
+pre_abi:
+    MOVD buf+0(FP), R0           // R0 = slice data pointer (8 bytes)
+    MOVD buf_len+8(FP), R1       // R1 = slice len          (8 bytes)
+    MOVD buf_cap+16(FP), R2      // R2 = slice cap          (8 bytes)
+    MOVD count+24(FP), R3        // R3 = count loop limit   (8 bytes)
+
 start:
     MOVD 16(g), R16
     CMP R16, RSP
@@ -54,7 +60,7 @@ epilogue:
     RET
 
 panic_block:
-    CALL runtime·panicIndex(SB)  // Call out-of-bounds panic
+    CALL ·goPanicIndex(SB)  // Call out-of-bounds panic
     NOOP
 
 morestack_block:

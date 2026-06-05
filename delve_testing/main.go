@@ -15,3 +15,7 @@ func write_to_buffer(buffer []byte, count int) {
 
 //go:noescape
 func mov_bytes(buffer []byte, count int)
+
+func goPanicIndex() {
+	panic("runtime error: index out of range")
+}
