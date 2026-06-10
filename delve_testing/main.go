@@ -1,11 +1,21 @@
 package main
 
+import (
+	"fmt"
+	"time"
+)
+
 const count = 1024
 
 func main() {
-	data := make([]byte, count)
-	dec_bytes(data, count)
+	now := time.Now()
+	fmt.Println(now.Second())
 }
+
+// func main() {
+// 	data := make([]byte, count)
+// 	dec_bytes(data, count)
+// }
 
 func write_to_buffer(buffer []byte, count int) {
 	for i := range count {
@@ -13,6 +23,7 @@ func write_to_buffer(buffer []byte, count int) {
 	}
 }
 
+/*
 //go:noescape
 func mov_bytes(buffer []byte, count int)
 
@@ -31,3 +42,4 @@ func dec_bytes(buffer []byte, count int)
 func goPanicIndex() {
 	panic("runtime error: index out of range")
 }
+*/

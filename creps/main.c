@@ -3,6 +3,10 @@
 #include <stdio.h>
 
 int main(void) {
+}
+
+/*
+int main(void) {
     u64 OSFreq = get_os_timer_frequency();
     printf("OS Freq: %llu\n", OSFreq);
 
@@ -28,6 +32,7 @@ int main(void) {
 
     return 0;
 }
+*/
 
 /*
 int main() {
