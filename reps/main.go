@@ -18,11 +18,11 @@ var CPU_FREQ u64
 
 func main() {
 	CPU_FREQ = metrics.EstimateCPUFrequency() * 2 * 1000
-	run_reps(func() int { return write_all(1024) }, "write_all")
-	run_reps(func() int { return mov_all(1024) }, "mov_all")
-	run_reps(func() int { return mov_quick(1024) }, "mov_quick")
-	run_reps(func() int { return nop_all(1024) }, "nop_all")
-	run_reps(func() int { return cmp_all(1024) }, "cmp_all")
+	// run_reps(func() int { return write_all(1024) }, "write_all")
+	// run_reps(func() int { return mov_all(1024) }, "mov_all")
+	// run_reps(func() int { return mov_quick(1024) }, "mov_quick")
+	// run_reps(func() int { return nop_all(1024) }, "nop_all")
+	// run_reps(func() int { return cmp_all(1024) }, "cmp_all")
 	run_reps(func() int { return dec_all(1024) }, "dec_all")
 }
 

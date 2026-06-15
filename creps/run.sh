@@ -1,3 +1,3 @@
-gcc main.c -o temp &&
+gcc -g main.c -o temp &&
     ./temp
 rm ./temp

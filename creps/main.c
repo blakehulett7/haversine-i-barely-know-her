@@ -1,8 +1,18 @@
 #include "brix.c"
+#include "tester.c"
 #include "types.h"
 #include <stdio.h>
 
+u64 write_all(void) {
+    u8 buffer[1024];
+    for (int i = 0; i < 1024; i++) {
+        buffer[i] = (u8)(i);
+    }
+    return 1024;
+}
+
 int main(void) {
+    run_reps(write_all, "write_all");
 }
 
 /*
