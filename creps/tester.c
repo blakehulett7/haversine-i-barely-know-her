@@ -1,3 +1,5 @@
+#pragma once
+#include "brix.c"
 #include "h_tester.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,6 +37,7 @@ void print_time(char const *Label, f64 CPUTime, u64 CPUTimerFreq, u64 ByteCount)
 }
 
 void print_new_min(Tester *t) {
+    printf("new min\r");
 }
 
 void print_metrics(Tester *t) {
@@ -47,12 +50,14 @@ void print_metrics(Tester *t) {
     printf("Avg: %fgb/s\t%f cycles/byte\n", avg, clock_speed / avg);
 }
 
-void end(Tester *t, u64 bytes_processed) {
+bool end(Tester *t, u64 bytes_processed) {
     if (!t) {
-        return;
+        return true;
     }
 
-    t->accumulated_time += read_cpu_timer();
+    u64 current_time = read_cpu_timer();
+
+    t->accumulated_time += current_time;
     t->accumulated_bytes += bytes_processed;
 
     test_results *results = &t->results;
@@ -61,21 +66,37 @@ void end(Tester *t, u64 bytes_processed) {
         results->max_time = t->accumulated_time;
     }
 
-    if (results->min_time > t->accumulated_time) {
+    if (results->min_time > t->accumulated_time || results->min_time == 0) {
         results->min_time = t->accumulated_time;
+        t->started_at = current_time;
         print_new_min(t);
     }
 
     results->total_bytes += t->accumulated_bytes;
     results->total_time += t->accumulated_time;
 
-    print_metrics(t);
+    if (current_time - t->started_at > t->test_for) {
+        return true;
+    }
+
+    return false;
 }
 
 void run_reps(func test, char *label) {
-    Tester t = {.test_for = 10 * Sec};
+    Tester t = {
+        .started_at = read_cpu_timer(),
+        .test_for = 10 * get_os_timer_frequency(),
+    };
 
-    begin(&t);
-    u64 bytes = test();
-    end(&t, bytes);
+    while (true) {
+        begin(&t);
+        u64 bytes = test();
+        bool done = end(&t, bytes);
+
+        if (done) {
+            break;
+        }
+    }
+
+    print_metrics(&t);
 }

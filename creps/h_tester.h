@@ -10,8 +10,9 @@ typedef struct {
 typedef struct {
     u64 bytes_processed;
     u64 expected_bytes;
-    u64 test_for;
 
+    u64 started_at;
+    u64 test_for;
     u64 accumulated_bytes;
     u64 accumulated_time;
 

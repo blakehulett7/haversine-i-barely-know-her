@@ -5,7 +5,7 @@
 TEXT ·linear_add(SB), NOSPLIT|NOFRAME, $0-0
 
 prologue:
-    MOVD $1000, R0
+    MOVD $100000, R0
     EOR R1, R1
 
 loop_increment:

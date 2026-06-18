@@ -45,6 +45,18 @@ func cmp_bytes(buffer []byte, count int)
 //go:noescape
 func dec_bytes(buffer []byte, count int)
 
+//go:noescape
+func store_x1(buffer []byte, count int)
+
+//go:noescape
+func store_x2(buffer []byte, count int)
+
+//go:noescape
+func store_x3(buffer []byte, count int)
+
+//go:noescape
+func store_x4(buffer []byte, count int)
+
 func write_all(count int) int {
 	data := make([]byte, count)
 	for i := range count {

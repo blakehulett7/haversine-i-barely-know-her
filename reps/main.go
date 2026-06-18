@@ -23,7 +23,21 @@ func main() {
 	// run_reps(func() int { return mov_quick(1024) }, "mov_quick")
 	// run_reps(func() int { return nop_all(1024) }, "nop_all")
 	// run_reps(func() int { return cmp_all(1024) }, "cmp_all")
-	run_reps(func() int { return dec_all(1024) }, "dec_all")
+	// run_reps(func() int { dec_bytes(nil, 1024); return 1024 }, "dec_all")
+	// run_reps(func() int { linear_add(); return 100000 }, "linear")
+	// run_reps(func() int { non_linear_add(); return 100000 }, "non_linear")
+
+	src := []byte{1, 2, 3, 4, 5, 6, 7, 8}
+
+	run_reps(func() int { store_x1(src, 100000); return 100000 }, "store_x1")
+	run_reps(func() int { store_x2(src, 100000); return 100000 }, "store_x2")
+	run_reps(func() int { store_x3(src, 100000); return 100000 }, "store_x3")
+	run_reps(func() int { store_x4(src, 100000); return 100000 }, "store_x4")
+
+	run_reps(func() int { read_x1(src, 100000); return 100000 }, "read_x1")
+	run_reps(func() int { read_x2(src, 100000); return 100000 }, "read_x2")
+	run_reps(func() int { read_x3(src, 100000); return 100000 }, "read_x3")
+	run_reps(func() int { read_x4(src, 100000); return 100000 }, "read_x4")
 }
 
 func ReadingReps() {
