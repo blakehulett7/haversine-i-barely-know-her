@@ -29,15 +29,15 @@ func main() {
 
 	src := []byte{1, 2, 3, 4, 5, 6, 7, 8}
 
-	run_reps(func() int { store_x1(src, 100000); return 100000 }, "store_x1")
-	run_reps(func() int { store_x2(src, 100000); return 100000 }, "store_x2")
-	run_reps(func() int { store_x3(src, 100000); return 100000 }, "store_x3")
-	run_reps(func() int { store_x4(src, 100000); return 100000 }, "store_x4")
+	// run_reps(func() int { store_x1(src, 100000); return 100000 }, "store_x1")
+	// run_reps(func() int { store_x2(src, 100000); return 100000 }, "store_x2")
+	// run_reps(func() int { store_x3(src, 100000); return 100000 }, "store_x3")
+	// run_reps(func() int { store_x4(src, 100000); return 100000 }, "store_x4")
 
-	run_reps(func() int { read_x1(src, 100000); return 100000 }, "read_x1")
-	run_reps(func() int { read_x2(src, 100000); return 100000 }, "read_x2")
 	run_reps(func() int { read_x3(src, 100000); return 100000 }, "read_x3")
-	run_reps(func() int { read_x4(src, 100000); return 100000 }, "read_x4")
+	run_reps(func() int { read_4x3(src, 100000); return 100000 / 2 }, "read_4x3")
+	run_reps(func() int { read_8x3(src, 100000); return 100000 }, "read_8x3")
+	run_reps(func() int { read_16x3(src, 100000); return 100000 }, "read_16x3")
 }
 
 func ReadingReps() {
