@@ -11,7 +11,9 @@ ControlToken :: enum {
 
 Error :: enum {
 	nil,
-	Invalid_Dest,
+	Dest_Not_Pointer,
+	Invalid_Float,
+	Invalid_Int,
 	Invalid_String,
 	Unexpected_Rune,
 }

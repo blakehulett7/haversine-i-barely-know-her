@@ -33,5 +33,5 @@ main :: proc() {
 
 	_ = os.write_entire_file("data/answers.f64", slice.to_bytes(answers))
 
-	// bson.parse(&out, []byte{})
+	err := bson.parse(&out, []byte{})
 }

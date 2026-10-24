@@ -1,6 +1,8 @@
 package bson
 
+import "core:strconv"
 import "core:unicode"
+import "core:unicode/utf8"
 
 lex_runes :: proc(runes: []rune) -> (tokens: [dynamic]Token, err: Error) {
 	l: Lexer
@@ -27,13 +29,13 @@ lex_normal :: proc(lexer: ^Lexer, r: rune) -> Error {
 	}
 
 	if unicode.is_space(r) {
-		return nil
+		return .nil
 	}
 
 	if unicode.is_number(r) || r == '-' {
 		lexer.Status = .Int
 		append(&lexer.Buffer, r)
-		return nil
+		return .nil
 	}
 
 	switch r {
@@ -58,6 +60,78 @@ lex_normal :: proc(lexer: ^Lexer, r: rune) -> Error {
 	return .nil
 }
 
-lex_int :: proc(lexer: ^Lexer, r: rune) -> Error {return .nil}
-lex_float :: proc(lexer: ^Lexer, r: rune) -> Error {return .nil}
-lex_string :: proc(lexer: ^Lexer, r: rune) -> Error {return .nil}
+lex_int :: proc(lexer: ^Lexer, r: rune) -> Error {
+	if unicode.is_number(r) {
+		append(&lexer.Buffer, r)
+		return .nil
+	}
+
+	if r == '.' {
+		append(&lexer.Buffer, r)
+		lexer.Status = .Float
+		return .nil
+	}
+
+	if !unicode.is_space(r) && r != ',' {
+		return .Invalid_Int
+	}
+
+	s := utf8.runes_to_string(lexer.Buffer[:])
+	token, ok := strconv.parse_int(s)
+	if !ok {
+		return .Invalid_Int
+	}
+
+	append(&lexer.Tokens, token)
+	clear(&lexer.Buffer)
+	lexer.Status = .Normal
+
+	if r == ',' {
+		append(&lexer.Tokens, ControlToken.Comma)
+	}
+
+	return .nil
+}
+
+lex_float :: proc(lexer: ^Lexer, r: rune) -> Error {
+	if unicode.is_number(r) {
+		append(&lexer.Buffer, r)
+		return .nil
+	}
+
+	if !unicode.is_space(r) && r != ',' {
+		return .Invalid_Float
+	}
+
+	if lexer.Buffer[len(lexer.Buffer) - 1] == '.' {
+		return .Invalid_Float
+	}
+
+	s := utf8.runes_to_string(lexer.Buffer[:])
+	token, ok := strconv.parse_f64(s)
+	if !ok {
+		return .Invalid_Float
+	}
+
+	append(&lexer.Tokens, token)
+	clear(&lexer.Buffer)
+	lexer.Status = .Normal
+
+	if r == ',' {
+		append(&lexer.Tokens, ControlToken.Comma)
+	}
+
+	return .nil
+}
+
+lex_string :: proc(lexer: ^Lexer, r: rune) -> Error {
+	if r != '"' {
+		append(&lexer.Buffer, r)
+		return .nil
+	}
+
+	token := utf8.runes_to_string(lexer.Buffer[:])
+	append(&lexer.Tokens, token)
+	clear(&lexer.Buffer)
+	return .nil
+}
