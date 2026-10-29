@@ -43,16 +43,11 @@ func Parse(dest any, data []byte) error {
 }
 
 type parser struct {
-	status      parser_status
-	valid_close bool
-	valid_open  bool
+	status parser_status
 
 	dest_stack   stack.Stack[reflect.Value]
 	key_stack    stack.Stack[string]
 	status_stack stack.Stack[parser_status]
-
-	final any
-	dest  reflect.Value
 }
 
 func newParser() *parser {
