@@ -31,6 +31,17 @@ LexerStatus :: enum {
 	String,
 }
 
+Parser :: struct {
+	status:       ParserStatus,
+	dest_stack:   [dynamic]any,
+	key_stack:    [dynamic]string,
+	status_stack: [dynamic]ParserStatus,
+}
+
+ParserStatus :: enum {
+	Value,
+}
+
 Token :: union {
 	ControlToken,
 	int,

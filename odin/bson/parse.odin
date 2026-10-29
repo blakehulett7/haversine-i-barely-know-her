@@ -17,5 +17,10 @@ parse :: proc(dest: any, data: []byte) -> Error {
 	runes := utf8.string_to_runes(s)
 	tokens := lex_runes(runes) or_return
 
+	parser: Parser
+	for token in tokens {
+		read_token(&parser, token)
+	}
+
 	return .nil
 }
