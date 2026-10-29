@@ -14,7 +14,7 @@ max_x_radius :: 15
 max_y_radius :: 30
 num_clusters :: 16
 
-input :: proc(seed, num: u64) -> Out {
+input :: proc(seed, num: u64) -> (Out, []byte) {
 	result := make([dynamic]Pair, 0, num)
 
 	input_seed := seed
@@ -74,12 +74,11 @@ input :: proc(seed, num: u64) -> Out {
 	if err != nil {
 		fmt.println("could not save data")
 		delete(result)
-		return Out{}
+		return Out{}, nil
 	}
 
 	_ = os.write_entire_file("data/pairs.json", data)
-	delete(data)
-	return o
+	return o, data
 }
 
 wrap_x :: proc(x: f64) -> f64 {

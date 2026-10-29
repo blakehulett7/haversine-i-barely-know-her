@@ -17,7 +17,7 @@ main :: proc() {
 
 	config: Config
 	flags.parse_or_exit(&config, os.args)
-	out := generator.input(config.seed, config.num)
+	out, data := generator.input(config.seed, config.num)
 
 	haversine_sum: f64
 	answers := make([]f64, config.num)
@@ -33,5 +33,13 @@ main :: proc() {
 
 	_ = os.write_entire_file("data/answers.f64", slice.to_bytes(answers))
 
-	err := bson.parse(&out, []byte{})
+	parsed: generator.Out
+
+	err := bson.parse(&parsed, data)
+	if err != nil {
+		fmt.printfln("error: %v\n", err)
+		return
+	}
+
+	fmt.println(parsed)
 }
