@@ -12,9 +12,14 @@ ControlToken :: enum {
 Error :: enum {
 	nil,
 	Dest_Not_Pointer,
+	EmptyDestStack,
 	Invalid_Float,
 	Invalid_Int,
 	Invalid_String,
+	Unexpected_Colon,
+	Unexpected_Comma,
+	Unexpected_End_Of_Array,
+	Unexpected_End_Of_Object,
 	Unexpected_Rune,
 }
 
@@ -40,6 +45,7 @@ Parser :: struct {
 
 ParserStatus :: enum {
 	Value,
+	Array,
 }
 
 Token :: union {
