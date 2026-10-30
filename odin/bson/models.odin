@@ -13,6 +13,8 @@ Error :: enum {
 	nil,
 	Dest_Not_Pointer,
 	EmptyDestStack,
+	Expected_Control_Token,
+	Invalid_Control_Token,
 	Invalid_Float,
 	Invalid_Int,
 	Invalid_String,
@@ -38,6 +40,8 @@ LexerStatus :: enum {
 
 Parser :: struct {
 	status:       ParserStatus,
+	dest:         any,
+	key:          string,
 	dest_stack:   [dynamic]any,
 	key_stack:    [dynamic]string,
 	status_stack: [dynamic]ParserStatus,
@@ -46,6 +50,7 @@ Parser :: struct {
 ParserStatus :: enum {
 	Value,
 	Array,
+	String,
 }
 
 Token :: union {

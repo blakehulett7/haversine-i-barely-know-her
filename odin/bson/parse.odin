@@ -1,7 +1,6 @@
 package bson
 
 import "core:fmt"
-import "core:mem"
 import "core:reflect"
 import "core:unicode/utf8"
 
@@ -19,7 +18,7 @@ parse :: proc(dest: any, data: []byte) -> Error {
 	tokens := lex_runes(runes) or_return
 
 	parser: Parser
-	append(&parser.dest_stack, reflect.deref(dest))
+	parser.dest = reflect.deref(dest)
 	for token in tokens {
 		read_token(&parser, token)
 	}
@@ -31,36 +30,47 @@ read_token :: proc(parser: ^Parser, token: Token) -> Error {
 	#partial switch parser.status {
 	case .Value:
 		return read_value(parser, token)
+	case .String:
+		return read_string(parser, token)
 	}
+
 	return .nil
 }
 
 read_value :: proc(p: ^Parser, token: Token) -> Error {
-	switch type in token {
+	switch value in token {
 	case ControlToken:
-		return read_control_token(p, type)
+		return read_control_token(p, value)
 	case int:
 	case f64:
+		if p.dest == nil {
+			return .EmptyDestStack
+		}
+
+		if p.key == "" {
+			(^f64)(p.dest.data)^ = value
+			break
+		}
+
+		field := reflect.struct_field_by_name(p.dest.id, p.key)
+		if field.name == "" {
+			break
+		}
+
+		field_address := rawptr(uintptr(p.dest.data) + field.offset)
+		(^f64)(field_address)^ = value
+		p.key = ""
+
+	case string:
 		if len(p.dest_stack) == 0 {
 			return .EmptyDestStack
 		}
 		dest := pop(&p.dest_stack)
 
-		if len(p.key_stack) == 0 {
-			(^f64)(dest.data)^ = type
-			break
-		}
+		p.key = value
+		append(&p.status_stack, p.status)
 
-		key := pop(&p.key_stack)
-		field := reflect.struct_field_by_name(dest.id, key)
-		if field.name == "" {
-			break
-		}
-
-		field_address := rawptr(uintptr(dest.data) + field.offset)
-		(^f64)(field_address)^ = type
-
-	case string:
+		p.status = .String
 	}
 
 	return .nil
@@ -85,6 +95,49 @@ read_control_token :: proc(p: ^Parser, token: ControlToken) -> Error {
 		return .nil
 	case .Object_End:
 		return .Unexpected_End_Of_Object
+	}
+
+	return .nil
+}
+
+read_string :: proc(p: ^Parser, token: Token) -> Error {
+	#partial switch control in token {
+	case ControlToken:
+		#partial switch control {
+		case .Colon:
+			p.status = .Value
+			break
+		case .Comma:
+			previous_status := pop(&p.status_stack)
+			if previous_status != .Array {
+				return .Unexpected_Comma
+			}
+
+		// TODO: Implement for robust comma handling
+
+		case .Object_End:
+			dest := pop(&p.dest_stack)
+
+			value := pop(&p.key_stack)
+			if len(p.key_stack) == 0 {
+				(^string)(dest.data)^ = value
+				break
+			}
+
+			key := pop(&p.key_stack)
+			field := reflect.struct_field_by_name(dest.id, key)
+			if field.name == "" {
+				break
+			}
+
+			field_address := rawptr(uintptr(dest.data) + field.offset)
+			(^string)(field_address)^ = value
+
+		case:
+			return .Invalid_Control_Token
+		}
+	case:
+		return .Expected_Control_Token
 	}
 
 	return .nil
