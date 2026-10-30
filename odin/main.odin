@@ -4,12 +4,13 @@ import "bson"
 import "core:flags"
 import "core:fmt"
 import "core:os"
-import "core:slice"
 import "generator"
 
 Config :: struct {
-	num:  u64 `args:"name=n,required" usage:"enter number of pairs to generate"`,
-	seed: u64 `args:"name=s" usage:"enter a random seed"`,
+	generate: bool `args:"name=g" usage:"pass true to generate new input file"`,
+	num:      u64 `args:"name=n" usage:"enter number of pairs to generate"`,
+	seed:     u64 `args:"name=s" usage:"enter a random seed"`,
+	data:     string `args:"name=d" usage:"enter the path to the input json file"`,
 }
 
 main :: proc() {
@@ -17,23 +18,34 @@ main :: proc() {
 
 	config: Config
 	flags.parse_or_exit(&config, os.args)
-	out, data := generator.input(config.seed, config.num)
 
-	haversine_sum: f64
-	answers := make([]f64, config.num)
-
-	for pair, i in out.pairs {
-		haversine := reference_haversine(pair.x0, pair.y0, pair.x1, pair.y1)
-		haversine_sum += haversine
-		answers[i] = haversine
+	if config.generate && config.num == 0 {
+		fmt.println("invalid config, must pass num if in generate mode")
+		os.exit(1)
 	}
 
-	avg_haversine := haversine_sum / f64(len(out.pairs))
-	fmt.println(avg_haversine)
+	if config.generate {
+		err := generator.input(config.seed, config.num)
+		if err != nil {
+			fmt.printfln("error generating input json: %v", err)
+			os.exit(1)
+		}
+		os.exit(0)
+	}
 
-	_ = os.write_entire_file("data/answers.f64", slice.to_bytes(answers))
+	path := config.data
+	if path == "" {
+		fmt.println("using default data path")
+		path = "data/pairs.json"
+	}
 
 	parsed: generator.Out
+
+	data, readErr := os.read_entire_file("data/pairs.json", context.allocator)
+	if readErr != nil {
+		fmt.println("could not read json file")
+		os.exit(1)
+	}
 
 	err := bson.parse(&parsed, data)
 	if err != nil {
