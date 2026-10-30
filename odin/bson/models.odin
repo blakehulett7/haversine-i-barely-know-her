@@ -12,7 +12,7 @@ ControlToken :: enum {
 Error :: enum {
 	nil,
 	Dest_Not_Pointer,
-	EmptyDestStack,
+	EmptyDest,
 	Expected_Control_Token,
 	Invalid_Control_Token,
 	Invalid_Float,

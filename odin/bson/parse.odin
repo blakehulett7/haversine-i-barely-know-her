@@ -19,7 +19,8 @@ parse :: proc(dest: any, data: []byte) -> Error {
 
 	parser: Parser
 	parser.dest = reflect.deref(dest)
-	for token in tokens {
+	for token in tokens[:10] {
+		fmt.printfln("parsing token: %v", token)
 		read_token(&parser, token)
 	}
 
@@ -44,7 +45,7 @@ read_value :: proc(p: ^Parser, token: Token) -> Error {
 	case int:
 	case f64:
 		if p.dest == nil {
-			return .EmptyDestStack
+			return .EmptyDest
 		}
 
 		if p.key == "" {
@@ -62,14 +63,16 @@ read_value :: proc(p: ^Parser, token: Token) -> Error {
 		p.key = ""
 
 	case string:
-		if len(p.dest_stack) == 0 {
-			return .EmptyDestStack
+		if p.dest == nil {
+			return .EmptyDest
 		}
-		dest := pop(&p.dest_stack)
+
+		if p.key != "" {
+			append(&p.key_stack, p.key)
+		}
 
 		p.key = value
 		append(&p.status_stack, p.status)
-
 		p.status = .String
 	}
 
@@ -105,16 +108,12 @@ read_string :: proc(p: ^Parser, token: Token) -> Error {
 	case ControlToken:
 		#partial switch control {
 		case .Colon:
-			p.status = .Value
+			p.status = pop(&p.status_stack)
+			assert(p.status == .Value)
 			break
 		case .Comma:
-			previous_status := pop(&p.status_stack)
-			if previous_status != .Array {
-				return .Unexpected_Comma
-			}
-
-		// TODO: Implement for robust comma handling
-
+			// TODO: Implement for robust comma handling
+			return .Unexpected_Comma
 		case .Object_End:
 			dest := pop(&p.dest_stack)
 
