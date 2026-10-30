@@ -6,18 +6,38 @@ import "core:unicode/utf8"
 
 lex_runes :: proc(runes: []rune) -> (tokens: [dynamic]Token, err: Error) {
 	l: Lexer
+	defer delete(l.Buffer)
+	defer if err != nil {
+		delete(l.Tokens)
+	}
 
 	for r in runes {
 		switch l.Status {
 		case .Normal:
-			lex_normal(&l, r) or_return
+			err = lex_normal(&l, r)
 		case .Int:
-			lex_int(&l, r) or_return
+			err = lex_int(&l, r)
 		case .Float:
-			lex_float(&l, r) or_return
+			err = lex_float(&l, r)
 		case .String:
-			lex_string(&l, r) or_return
+			err = lex_string(&l, r)
 		}
+		if err != nil {
+			return
+		}
+	}
+
+	switch l.Status {
+	case .Normal:
+	case .Int:
+		err = finish_int(&l)
+	case .Float:
+		err = finish_float(&l)
+	case .String:
+		err = .Invalid_String
+	}
+	if err != nil {
+		return
 	}
 
 	return l.Tokens, .nil
@@ -72,24 +92,12 @@ lex_int :: proc(lexer: ^Lexer, r: rune) -> Error {
 		return .nil
 	}
 
-	if !unicode.is_space(r) && r != ',' {
+	if !is_number_end(r) {
 		return .Invalid_Int
 	}
 
-	s := utf8.runes_to_string(lexer.Buffer[:])
-	token, ok := strconv.parse_int(s)
-	if !ok {
-		return .Invalid_Int
-	}
-
-	append(&lexer.Tokens, token)
-	clear(&lexer.Buffer)
-	lexer.Status = .Normal
-
-	if r == ',' {
-		append(&lexer.Tokens, ControlToken.Comma)
-	}
-
+	finish_int(lexer) or_return
+	emit_number_end(lexer, r)
 	return .nil
 }
 
@@ -99,28 +107,12 @@ lex_float :: proc(lexer: ^Lexer, r: rune) -> Error {
 		return .nil
 	}
 
-	if !unicode.is_space(r) && r != ',' {
+	if !is_number_end(r) {
 		return .Invalid_Float
 	}
 
-	if lexer.Buffer[len(lexer.Buffer) - 1] == '.' {
-		return .Invalid_Float
-	}
-
-	s := utf8.runes_to_string(lexer.Buffer[:])
-	token, ok := strconv.parse_f64(s)
-	if !ok {
-		return .Invalid_Float
-	}
-
-	append(&lexer.Tokens, token)
-	clear(&lexer.Buffer)
-	lexer.Status = .Normal
-
-	if r == ',' {
-		append(&lexer.Tokens, ControlToken.Comma)
-	}
-
+	finish_float(lexer) or_return
+	emit_number_end(lexer, r)
 	return .nil
 }
 
@@ -135,4 +127,53 @@ lex_string :: proc(lexer: ^Lexer, r: rune) -> Error {
 	clear(&lexer.Buffer)
 	lexer.Status = .Normal
 	return .nil
+}
+
+finish_int :: proc(lexer: ^Lexer) -> Error {
+	s := utf8.runes_to_string(lexer.Buffer[:])
+	defer delete(s)
+
+	token, ok := strconv.parse_int(s)
+	if !ok {
+		return .Invalid_Int
+	}
+
+	append(&lexer.Tokens, token)
+	clear(&lexer.Buffer)
+	lexer.Status = .Normal
+	return .nil
+}
+
+finish_float :: proc(lexer: ^Lexer) -> Error {
+	if len(lexer.Buffer) == 0 || lexer.Buffer[len(lexer.Buffer) - 1] == '.' {
+		return .Invalid_Float
+	}
+
+	s := utf8.runes_to_string(lexer.Buffer[:])
+	defer delete(s)
+
+	token, ok := strconv.parse_f64(s)
+	if !ok {
+		return .Invalid_Float
+	}
+
+	append(&lexer.Tokens, token)
+	clear(&lexer.Buffer)
+	lexer.Status = .Normal
+	return .nil
+}
+
+is_number_end :: proc(r: rune) -> bool {
+	return unicode.is_space(r) || r == ',' || r == '}' || r == ']'
+}
+
+emit_number_end :: proc(lexer: ^Lexer, r: rune) {
+	switch r {
+	case ',':
+		append(&lexer.Tokens, ControlToken.Comma)
+	case '}':
+		append(&lexer.Tokens, ControlToken.Object_End)
+	case ']':
+		append(&lexer.Tokens, ControlToken.Array_End)
+	}
 }

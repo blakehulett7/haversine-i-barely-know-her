@@ -23,6 +23,7 @@ Error :: enum {
 	Unexpected_End_Of_Array,
 	Unexpected_End_Of_Object,
 	Unexpected_Rune,
+	Unexpected_Token,
 }
 
 Lexer :: struct {
