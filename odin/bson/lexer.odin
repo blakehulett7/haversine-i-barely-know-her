@@ -133,5 +133,6 @@ lex_string :: proc(lexer: ^Lexer, r: rune) -> Error {
 	token := utf8.runes_to_string(lexer.Buffer[:])
 	append(&lexer.Tokens, token)
 	clear(&lexer.Buffer)
+	lexer.Status = .Normal
 	return .nil
 }

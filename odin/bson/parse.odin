@@ -17,6 +17,8 @@ parse :: proc(dest: any, data: []byte) -> Error {
 	runes := utf8.string_to_runes(s)
 	tokens := lex_runes(runes) or_return
 
+	fmt.println(tokens[:20])
+
 	parser: Parser
 	parser.dest = reflect.deref(dest)
 	for token in tokens[:10] {
