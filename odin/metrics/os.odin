@@ -1,5 +1,6 @@
 package metrics
 
+import "../perform"
 import "core:fmt"
 foreign import libsystem "System.framework"
 
@@ -19,7 +20,7 @@ os_time_test :: proc() {
 
 	start := mach_absolute_time()
 
-	// TODO: Work
+	perform.work("data/pairs.json")
 
 	end := mach_absolute_time()
 
