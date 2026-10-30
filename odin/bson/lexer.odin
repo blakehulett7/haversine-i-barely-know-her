@@ -133,15 +133,44 @@ finish_int :: proc(lexer: ^Lexer) -> Error {
 	s := utf8.runes_to_string(lexer.Buffer[:])
 	defer delete(s)
 
-	token, ok := strconv.parse_int(s)
-	if !ok {
+	if len(s) == 0 {
 		return .Invalid_Int
 	}
 
-	append(&lexer.Tokens, token)
+	if s[0] == '-' {
+		token, ok := strconv.parse_int(s)
+		if !ok {
+			return .Invalid_Int
+		}
+		append(&lexer.Tokens, token)
+	} else if token, ok := parse_u64_checked(s); ok {
+		append(&lexer.Tokens, token)
+	} else {
+		return .Invalid_Int
+	}
+
 	clear(&lexer.Buffer)
 	lexer.Status = .Normal
 	return .nil
+}
+
+parse_u64_checked :: proc(s: string) -> (value: u64, ok: bool) {
+	if len(s) == 0 {
+		return 0, false
+	}
+
+	for r in s {
+		if r < '0' || r > '9' {
+			return 0, false
+		}
+		digit := u64(r - '0')
+		if value > (max(u64) - digit) / 10 {
+			return 0, false
+		}
+		value = value * 10 + digit
+	}
+
+	return value, true
 }
 
 finish_float :: proc(lexer: ^Lexer) -> Error {

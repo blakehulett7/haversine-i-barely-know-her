@@ -57,6 +57,7 @@ ParserStatus :: enum {
 Token :: union {
 	ControlToken,
 	int,
+	u64,
 	f64,
 	string,
 }

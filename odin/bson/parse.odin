@@ -52,6 +52,8 @@ read_value :: proc(p: ^Parser, token: Token) -> Error {
 		return read_control_token(p, value)
 	case int:
 		return write_number(p, token)
+	case u64:
+		return write_number(p, token)
 	case f64:
 		return write_number(p, token)
 	case string:
@@ -297,6 +299,8 @@ write_number :: proc(p: ^Parser, token: Token) -> Error {
 		write_f64(addr, id, value) or_return
 	case int:
 		write_int(addr, id, value) or_return
+	case u64:
+		write_u64(addr, id, value) or_return
 	case ControlToken, string:
 		return .Unexpected_Token
 	}
@@ -313,6 +317,33 @@ write_f64 :: proc(addr: rawptr, id: typeid, value: f64) -> Error {
 	}
 
 	(^f64)(addr)^ = value
+	return .nil
+}
+
+write_u64 :: proc(addr: rawptr, id: typeid, value: u64) -> Error {
+	info := reflect.type_info_base(type_info_of(id))
+	#partial switch v in info.variant {
+	case reflect.Type_Info_Float:
+		if info.size != size_of(f64) || value > (u64(1) << 53) {
+			return .Unexpected_Token
+		}
+		(^f64)(addr)^ = f64(value)
+	case reflect.Type_Info_Integer:
+		if info.size != size_of(u64) {
+			return .Unexpected_Token
+		}
+		if v.signed {
+			if value > u64(max(int)) {
+				return .Unexpected_Token
+			}
+			(^int)(addr)^ = int(value)
+		} else {
+			(^u64)(addr)^ = value
+		}
+	case:
+		return .Unexpected_Token
+	}
+
 	return .nil
 }
 
