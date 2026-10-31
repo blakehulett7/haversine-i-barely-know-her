@@ -33,6 +33,7 @@ go.work.sum
 
 binaries
 temp
+test
 
 # Editor/IDE
 # .idea/

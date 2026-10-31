@@ -1,5 +1,6 @@
 package main
 
+import "base:intrinsics"
 import "core:flags"
 import "core:fmt"
 import "core:os"
@@ -17,10 +18,6 @@ Config :: struct {
 main :: proc() {
 	fmt.println("Pax Vobiscum")
 
-	metrics.os_time_test()
-	return
-
-	/*
 	config: Config
 	flags.parse_or_exit(&config, os.args)
 
@@ -44,10 +41,10 @@ main :: proc() {
 		path = "data/pairs.json"
 	}
 
+
 	perform_err := perform.work(path)
 	if perform_err != nil {
 		fmt.printfln("error: %v", perform_err)
 		os.exit(1)
 	}
-    */
 }
