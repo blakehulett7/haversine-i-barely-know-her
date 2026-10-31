@@ -33,6 +33,8 @@ work :: proc(path: string) -> Error {
 	os.write_entire_file("data/computed.f64", slice.to_bytes(answers)) or_return
 	write_end := intrinsics.read_cycle_counter()
 
+	delete(answers)
+
 	fmt.printfln("expected avg: %f", parsed.answer)
 	fmt.printfln("got avg: %f", avg_haversine)
 	fmt.printfln("success: %t", avg_haversine == parsed.answer)

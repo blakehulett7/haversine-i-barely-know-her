@@ -20,6 +20,7 @@ parse :: proc(dest: any, data: []byte) -> Error {
 
 	parser: Parser
 	defer {
+		delete(data)
 		delete(parser.dest_stack)
 		delete(parser.key_stack)
 		delete(parser.status_stack)

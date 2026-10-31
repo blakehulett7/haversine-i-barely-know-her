@@ -70,6 +70,7 @@ input :: proc(seed, num: u64) -> Error {
 
 	haversine_sum: f64
 	answers := make([]f64, len(result))
+	defer delete(answers)
 
 	for pair, i in result {
 		haversine := calc.reference_haversine(pair.x0, pair.y0, pair.x1, pair.y1)
@@ -85,6 +86,8 @@ input :: proc(seed, num: u64) -> Error {
 		seed   = input_seed,
 		pairs  = result,
 	}
+
+	delete(result)
 
 	data := json.marshal(o, json.Marshal_Options{pretty = true}) or_return
 	os.write_entire_file("data/pairs.json", data) or_return
