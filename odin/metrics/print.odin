@@ -2,8 +2,7 @@ package metrics
 
 import "core:fmt"
 
-print_time_elapsed :: proc(label: string, total_elapsed, prof_begin, prof_end: i64) {
-	elapsed := prof_end - prof_begin
-	percent := 100.0 * (f64(elapsed) / f64(total_elapsed))
-	fmt.printf("  %s: %d (%.2f%%)\n", label, elapsed, percent)
+print_time_elapsed :: proc(label: string, total_elapsed, anchor_elapsed, anchor_hits: i64) {
+	percent := 100.0 * (f64(anchor_elapsed) / f64(total_elapsed))
+	fmt.printf("  %s: %d (%.2f%%) - %d Hits\n", label, anchor_elapsed, percent, anchor_hits)
 }
