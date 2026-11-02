@@ -10,8 +10,9 @@ global_parent: int
 profile :: proc(label: string) -> int {
 	global_profiler.anchors[global_profiler.anchor_index].start = intrinsics.read_cycle_counter()
 	global_profiler.anchors[global_profiler.anchor_index].parent_index = global_parent
+	global_parent = global_profiler.anchor_index
 	global_profiler.anchor_index += 1
-	return global_profiler.anchor_index - 1
+	return global_parent
 }
 
 
@@ -20,6 +21,7 @@ end_profile_block :: proc(label: string, idx: int) {
 	parent := &global_profiler.anchors[anchor.parent_index]
 	elapsed := intrinsics.read_cycle_counter() - anchor.start
 
+	global_parent = anchor.parent_index
 	parent.elapsed_children += elapsed
 
 	anchor.elapsed = elapsed
@@ -47,6 +49,6 @@ end_profiler :: proc() {
 
 	for i in 1 ..< global_profiler.anchor_index {
 		anchor := global_profiler.anchors[i]
-		print_time_elapsed(anchor.label, elapsed, anchor.elapsed, anchor.hits)
+		print_time_elapsed(anchor.label, elapsed, anchor)
 	}
 }
