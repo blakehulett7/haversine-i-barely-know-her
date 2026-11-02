@@ -20,7 +20,7 @@ end_profile_block :: proc(label: string, idx: int) {
 	parent := &global_profiler.anchors[anchor.parent_index]
 	elapsed := intrinsics.read_cycle_counter() - anchor.start
 
-	parent.elapsed_children = elapsed
+	parent.elapsed_children += elapsed
 
 	anchor.elapsed = elapsed
 	anchor.hits += 1
@@ -30,6 +30,7 @@ end_profile_block :: proc(label: string, idx: int) {
 @(deferred_none = end_profiler)
 begin_profiler :: proc() {
 	global_profiler.start = intrinsics.read_cycle_counter()
+	global_profiler.anchor_index = 1
 }
 
 end_profiler :: proc() {
@@ -44,7 +45,7 @@ end_profiler :: proc() {
 		cpu_freq,
 	)
 
-	for i in 0 ..< global_profiler.anchor_index {
+	for i in 1 ..< global_profiler.anchor_index {
 		anchor := global_profiler.anchors[i]
 		print_time_elapsed(anchor.label, elapsed, anchor.elapsed, anchor.hits)
 	}
