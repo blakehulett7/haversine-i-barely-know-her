@@ -5,28 +5,30 @@ import "core:fmt"
 
 global_profiler: profiler
 
-profile :: proc(func: proc() -> $T, label := #caller_expression(func)) -> T {
-	start := intrinsics.read_cycle_counter()
-	result := func()
-	elapsed := intrinsics.read_cycle_counter() - start
-
-	anchor := global_profiler.anchors[global_profiler.anchor_index]
-
-	anchor.elapsed += elapsed
-	anchor.hits += 1
-	anchor.label = label
-
-	global_profiler.anchor_index += 1
-
-	return result
+@(deferred_in = end_profile_block)
+profile :: proc(label: string) {
+	global_profiler.anchors[global_profiler.anchor_index].start = intrinsics.read_cycle_counter()
 }
 
+
+end_profile_block :: proc(label: string) {
+	global_profiler.anchors[global_profiler.anchor_index].elapsed =
+		intrinsics.read_cycle_counter() -
+		global_profiler.anchors[global_profiler.anchor_index].start
+	global_profiler.anchors[global_profiler.anchor_index].hits += 1
+	global_profiler.anchors[global_profiler.anchor_index].label = label
+	global_profiler.anchor_index += 1
+}
+
+@(deferred_none = end_profiler)
 begin_profiler :: proc() {
 	global_profiler.start = intrinsics.read_cycle_counter()
 }
 
 end_profiler :: proc() {
-	elapsed := global_profiler.start - intrinsics.read_cycle_counter()
+	elapsed := intrinsics.read_cycle_counter() - global_profiler.start
+
+	fmt.printfln("\nTotal ticks: %d", elapsed)
 
 	cpu_freq := intrinsics.read_cycle_counter_frequency()
 	fmt.printf(
@@ -35,7 +37,7 @@ end_profiler :: proc() {
 		cpu_freq,
 	)
 
-	for i in 0 ..= global_profiler.anchor_index {
+	for i in 0 ..< global_profiler.anchor_index {
 		anchor := global_profiler.anchors[i]
 		print_time_elapsed(anchor.label, elapsed, anchor.elapsed, anchor.hits)
 	}

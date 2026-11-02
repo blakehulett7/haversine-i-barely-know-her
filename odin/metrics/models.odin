@@ -7,6 +7,7 @@ profiler :: struct {
 }
 
 anchor :: struct {
+	start:   i64,
 	elapsed: i64,
 	hits:    i64,
 	label:   string,
