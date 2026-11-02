@@ -7,6 +7,7 @@ import "../metrics"
 import "core:fmt"
 import "core:os"
 import "core:slice"
+import "core:time"
 
 work :: proc(path: string) -> Error {
 	metrics.begin_profiler()
@@ -48,4 +49,14 @@ work :: proc(path: string) -> Error {
 	fmt.printfln("success: %t", avg_haversine == parsed.answer)
 
 	return nil
+}
+
+recurse :: proc(range, idx: int) {
+	metrics.profile("recurse")
+	if idx >= range {
+		return
+	}
+	time.sleep(10 * time.Millisecond)
+	recurse(range, idx + 1)
+	return
 }
