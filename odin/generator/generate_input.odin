@@ -17,6 +17,8 @@ max_y_radius :: 30
 num_clusters :: 16
 
 input :: proc(seed, num: u64) -> Error {
+	json.set_user_marshalers(new(map[typeid]json.User_Marshaler))
+	json.register_user_marshaler(f64, write_f64_exact)
 	result := make([dynamic]Pair, 0, num)
 
 	input_seed := seed
@@ -39,7 +41,6 @@ input :: proc(seed, num: u64) -> Error {
 		local_max_x := center_x + x_radius
 		local_min_y := center_y - y_radius
 		local_max_y := center_y + y_radius
-
 
 		for j in 0 ..< batch_size {
 			x0 := wrap_x(rand.float64_range(local_min_x, local_max_x))
@@ -87,11 +88,11 @@ input :: proc(seed, num: u64) -> Error {
 		pairs  = result,
 	}
 
-	delete(result)
-
 	data := json.marshal(o, json.Marshal_Options{pretty = true}) or_return
 	os.write_entire_file("data/pairs.json", data) or_return
 	os.write_entire_file("data/answers.f64", slice.to_bytes(answers)) or_return
+
+	delete(result)
 
 	return nil
 }
