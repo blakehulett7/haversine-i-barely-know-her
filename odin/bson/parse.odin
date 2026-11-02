@@ -1,5 +1,6 @@
 package bson
 
+import "../metrics/"
 import "base:runtime"
 import "core:reflect"
 import "core:unicode/utf8"
@@ -15,7 +16,11 @@ parse :: proc(dest: any, data: []byte) -> Error {
 	runes := utf8.string_to_runes(s)
 	defer delete(runes)
 
-	tokens := lex_runes(runes) or_return
+	tokens: [dynamic]Token
+	{
+		metrics.profile("lex")
+		tokens = lex_runes(runes) or_return
+	}
 	defer delete(tokens)
 
 	parser: Parser
