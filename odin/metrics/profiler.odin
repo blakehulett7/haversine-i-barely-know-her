@@ -8,10 +8,12 @@ global_parent: int
 
 @(deferred_in_out = end_profile_block)
 profile :: proc(label: string) -> int {
-	global_profiler.anchors[global_profiler.anchor_index].start = intrinsics.read_cycle_counter()
-	global_profiler.anchors[global_profiler.anchor_index].parent_index = global_parent
-	global_parent = global_profiler.anchor_index
-	global_profiler.anchor_index += 1
+	anchor_index := get_label_index(label)
+
+	global_profiler.anchors[anchor_index].start = intrinsics.read_cycle_counter()
+	global_profiler.anchors[anchor_index].parent_index = global_parent
+	global_parent = anchor_index
+
 	return global_parent
 }
 
@@ -24,7 +26,7 @@ end_profile_block :: proc(label: string, idx: int) {
 	global_parent = anchor.parent_index
 	parent.elapsed_children += elapsed
 
-	anchor.elapsed = elapsed
+	anchor.elapsed += elapsed
 	anchor.hits += 1
 	anchor.label = label
 }
@@ -32,7 +34,6 @@ end_profile_block :: proc(label: string, idx: int) {
 @(deferred_none = end_profiler)
 begin_profiler :: proc() {
 	global_profiler.start = intrinsics.read_cycle_counter()
-	global_profiler.anchor_index = 1
 }
 
 end_profiler :: proc() {
@@ -51,4 +52,16 @@ end_profiler :: proc() {
 		anchor := global_profiler.anchors[i]
 		print_time_elapsed(anchor.label, elapsed, anchor)
 	}
+}
+
+get_label_index :: proc(label: string) -> int {
+	for i in 0 ..< global_profiler.anchor_index {
+		anchor := global_profiler.anchors[i]
+		if anchor.label == label {
+			return i
+		}
+	}
+
+	global_profiler.anchor_index += 1
+	return global_profiler.anchor_index
 }
