@@ -4,20 +4,27 @@ import "base:intrinsics"
 import "core:fmt"
 
 global_profiler: profiler
+global_parent: int
 
-@(deferred_in = end_profile_block)
-profile :: proc(label: string) {
+@(deferred_in_out = end_profile_block)
+profile :: proc(label: string) -> int {
 	global_profiler.anchors[global_profiler.anchor_index].start = intrinsics.read_cycle_counter()
+	global_profiler.anchors[global_profiler.anchor_index].parent_index = global_parent
+	global_profiler.anchor_index += 1
+	return global_profiler.anchor_index - 1
 }
 
 
-end_profile_block :: proc(label: string) {
-	global_profiler.anchors[global_profiler.anchor_index].elapsed =
-		intrinsics.read_cycle_counter() -
-		global_profiler.anchors[global_profiler.anchor_index].start
-	global_profiler.anchors[global_profiler.anchor_index].hits += 1
-	global_profiler.anchors[global_profiler.anchor_index].label = label
-	global_profiler.anchor_index += 1
+end_profile_block :: proc(label: string, idx: int) {
+	anchor := &global_profiler.anchors[idx]
+	parent := &global_profiler.anchors[anchor.parent_index]
+	elapsed := intrinsics.read_cycle_counter() - anchor.start
+
+	parent.elapsed_children = elapsed
+
+	anchor.elapsed = elapsed
+	anchor.hits += 1
+	anchor.label = label
 }
 
 @(deferred_none = end_profiler)

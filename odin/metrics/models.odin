@@ -7,8 +7,10 @@ profiler :: struct {
 }
 
 anchor :: struct {
-	start:   i64,
-	elapsed: i64,
-	hits:    i64,
-	label:   string,
+	parent_index:     int,
+	start:            i64,
+	elapsed:          i64,
+	elapsed_children: i64,
+	hits:             i64,
+	label:            string,
 }
