@@ -12,8 +12,6 @@ import "core:time"
 work :: proc(path: string) -> Error {
 	metrics.begin_profiler()
 
-	recurse(10, 0)
-
 	parsed: generator.Out
 	data: []byte
 	{
