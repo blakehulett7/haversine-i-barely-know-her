@@ -7,7 +7,6 @@ import "../metrics"
 import "core:fmt"
 import "core:os"
 import "core:slice"
-import "core:time"
 
 work :: proc(path: string) -> Error {
 	metrics.begin_profiler()
@@ -56,7 +55,6 @@ recurse :: proc(range, idx: int) {
 	if idx >= range {
 		return
 	}
-	time.sleep(10 * time.Millisecond)
 	recurse(range, idx + 1)
 	return
 }
