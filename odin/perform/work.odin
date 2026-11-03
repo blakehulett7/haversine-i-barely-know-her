@@ -12,6 +12,8 @@ import "core:time"
 work :: proc(path: string) -> Error {
 	metrics.begin_profiler()
 
+	recurse(10, 0)
+
 	parsed: generator.Out
 	data: []byte
 	{
@@ -44,7 +46,7 @@ work :: proc(path: string) -> Error {
 		os.write_entire_file("data/computed.f64", slice.to_bytes(answers)) or_return
 	}
 
-	fmt.printfln("expected avg: %f", parsed.answer)
+	fmt.printfln("\nexpected avg: %f", parsed.answer)
 	fmt.printfln("got avg: %f", avg_haversine)
 	fmt.printfln("success: %t", avg_haversine == parsed.answer)
 

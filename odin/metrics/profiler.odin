@@ -57,7 +57,7 @@ end_profiler :: proc() {
 
 get_label_index :: proc(label: string) -> int {
 	// NOTE: Take this for loop out if we don't want anchor aggregation
-	for i in 0 ..< global_profiler.anchor_index {
+	for i in 1 ..= global_profiler.anchor_index {
 		if global_profiler.anchors[i].label == label {
 			return i
 		}
