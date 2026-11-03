@@ -3,11 +3,17 @@ package metrics
 import "base:intrinsics"
 import "core:fmt"
 
+ENABLE_PROFILER :: #config(PROF, false)
+
 global_profiler: profiler
 global_parent: int
 
 @(deferred_out = end_profile_block)
 profile :: proc(label: string) -> (start: i64, idx, parent_idx: int) {
+	when !ENABLE_PROFILER {
+		return 0, 0, 0
+	}
+
 	anchor_index := get_label_index(label)
 
 	parent_idx = global_parent
@@ -17,8 +23,11 @@ profile :: proc(label: string) -> (start: i64, idx, parent_idx: int) {
 	return intrinsics.read_cycle_counter(), anchor_index, parent_idx
 }
 
-
 end_profile_block :: proc(start: i64, idx, parent_idx: int) {
+	when !ENABLE_PROFILER {
+		return
+	}
+
 	elapsed := intrinsics.read_cycle_counter() - start
 	anchor := &global_profiler.anchors[idx]
 	parent := &global_profiler.anchors[parent_idx]
@@ -46,6 +55,10 @@ end_profiler :: proc() {
 		1000.0 * f64(elapsed) / f64(cpu_freq),
 		cpu_freq,
 	)
+
+	if !ENABLE_PROFILER {
+		return
+	}
 
 	for i in 1 ..< global_profiler.anchor_index {
 		anchor := global_profiler.anchors[i]
