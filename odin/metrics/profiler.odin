@@ -7,28 +7,29 @@ global_profiler: profiler
 global_parent: int
 
 @(deferred_in_out = end_profile_block)
-profile :: proc(label: string) -> int {
+profile :: proc(label: string) -> (start: i64, idx: int) {
 	anchor_index := get_label_index(label)
 
-	global_profiler.anchors[anchor_index].start = intrinsics.read_cycle_counter()
 	global_profiler.anchors[anchor_index].parent_index = global_parent
+	global_profiler.anchors[anchor_index].label = label
 	global_parent = anchor_index
 
-	return global_parent
+	return intrinsics.read_cycle_counter(), global_parent
 }
 
 
-end_profile_block :: proc(label: string, idx: int) {
+end_profile_block :: proc(label: string, start: i64, idx: int) {
+	elapsed := intrinsics.read_cycle_counter() - start
 	anchor := &global_profiler.anchors[idx]
 	parent := &global_profiler.anchors[anchor.parent_index]
-	elapsed := intrinsics.read_cycle_counter() - anchor.start
 
 	global_parent = anchor.parent_index
-	parent.elapsed_children += elapsed
 
-	anchor.elapsed += elapsed
+	parent.elapsed_exclusive -= elapsed
+	anchor.elapsed_exclusive += elapsed
+	anchor.elapsed_inclusive = elapsed
+
 	anchor.hits += 1
-	anchor.label = label
 }
 
 @(deferred_none = end_profiler)
