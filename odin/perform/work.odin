@@ -24,7 +24,7 @@ work :: proc(path: string) -> Error {
 		bson.parse(&parsed, data) or_return
 	}
 
-	answers := make([]f64, len(parsed.pairs))
+	answers := make([]f64, len(parsed.pairs), context.temp_allocator)
 	avg_haversine: f64
 
 	{

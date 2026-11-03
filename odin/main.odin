@@ -19,7 +19,6 @@ Config :: struct {
 
 main :: proc() {
 	fmt.println("Pax Vobiscum")
-
 	config: Config
 	flags.parse_or_exit(&config, os.args)
 
@@ -43,10 +42,9 @@ main :: proc() {
 		path = "data/pairs.json"
 	}
 
-
-	perform_err := perform.work(path)
-	if perform_err != nil {
-		fmt.printfln("error: %v", perform_err)
+	err := perform.work(path)
+	if err != nil {
+		fmt.printfln("error: %v", err)
 		os.exit(1)
 	}
 }
