@@ -6,29 +6,27 @@ import "core:fmt"
 global_profiler: profiler
 global_parent: int
 
-@(deferred_in_out = end_profile_block)
-profile :: proc(label: string) -> (start: i64, idx: int) {
+@(deferred_out = end_profile_block)
+profile :: proc(label: string) -> (start: i64, idx, parent_idx: int) {
 	anchor_index := get_label_index(label)
 
-	global_profiler.anchors[anchor_index].parent_index = global_parent
+	parent_idx = global_parent
 	global_profiler.anchors[anchor_index].label = label
 	global_parent = anchor_index
 
-	return intrinsics.read_cycle_counter(), global_parent
+	return intrinsics.read_cycle_counter(), anchor_index, parent_idx
 }
 
 
-end_profile_block :: proc(label: string, start: i64, idx: int) {
+end_profile_block :: proc(start: i64, idx, parent_idx: int) {
 	elapsed := intrinsics.read_cycle_counter() - start
 	anchor := &global_profiler.anchors[idx]
-	parent := &global_profiler.anchors[anchor.parent_index]
-
-	global_parent = anchor.parent_index
+	parent := &global_profiler.anchors[parent_idx]
+	global_parent = parent_idx
 
 	parent.elapsed_exclusive -= elapsed
 	anchor.elapsed_exclusive += elapsed
 	anchor.elapsed_inclusive = elapsed
-
 	anchor.hits += 1
 }
 
@@ -56,7 +54,7 @@ end_profiler :: proc() {
 }
 
 get_label_index :: proc(label: string) -> int {
-	// NOTE: Take this for loop out if we don't want anchor aggregation
+	// NOTE: Take this for loop out if we don't want anchor aggregation & recursion support in exchange for faster performance
 	for i in 1 ..= global_profiler.anchor_index {
 		if global_profiler.anchors[i].label == label {
 			return i
