@@ -1,6 +1,5 @@
 package metrics
 
-import "base:intrinsics"
 import "core:fmt"
 
 ENABLE_PROFILER :: #config(PROF, false)
@@ -20,7 +19,7 @@ profile :: proc(label: string) -> (start: i64, idx, parent_idx: int) {
 	global_profiler.anchors[anchor_index].label = label
 	global_parent = anchor_index
 
-	return intrinsics.read_cycle_counter(), anchor_index, parent_idx
+	return read_timer(), anchor_index, parent_idx
 }
 
 end_profile_block :: proc(start: i64, idx, parent_idx: int) {
@@ -28,7 +27,7 @@ end_profile_block :: proc(start: i64, idx, parent_idx: int) {
 		return
 	}
 
-	elapsed := intrinsics.read_cycle_counter() - start
+	elapsed := read_timer() - start
 	anchor := &global_profiler.anchors[idx]
 	parent := &global_profiler.anchors[parent_idx]
 	global_parent = parent_idx
@@ -41,15 +40,15 @@ end_profile_block :: proc(start: i64, idx, parent_idx: int) {
 
 @(deferred_none = end_profiler)
 begin_profiler :: proc() {
-	global_profiler.start = intrinsics.read_cycle_counter()
+	global_profiler.start = read_timer()
 }
 
 end_profiler :: proc() {
-	elapsed := intrinsics.read_cycle_counter() - global_profiler.start
+	elapsed := read_timer() - global_profiler.start
 
 	fmt.printfln("\nTotal ticks: %d", elapsed)
 
-	cpu_freq := intrinsics.read_cycle_counter_frequency()
+	cpu_freq := read_freq()
 	fmt.printf(
 		"Total time: %0.4fms (CPU freq %d)\n",
 		1000.0 * f64(elapsed) / f64(cpu_freq),
