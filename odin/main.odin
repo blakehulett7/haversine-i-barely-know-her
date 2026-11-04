@@ -1,13 +1,9 @@
 package main
 
-import "base:intrinsics"
 import "core:flags"
 import "core:fmt"
 import "core:os"
-import "core:slice"
-import "core:time"
 import "generator"
-import "metrics"
 import "perform"
 
 Config :: struct {

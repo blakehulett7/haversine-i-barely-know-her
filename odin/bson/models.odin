@@ -27,7 +27,7 @@ Error :: enum {
 }
 
 Lexer :: struct {
-	Status: LexerStatus,
+	Status: LexerStatus, // 4 bytes
 	Buffer: [dynamic]rune,
 	Tokens: [dynamic]Token,
 }
@@ -40,10 +40,10 @@ LexerStatus :: enum {
 }
 
 Parser :: struct {
-	status:       ParserStatus,
-	dest:         any,
-	key:          string,
-	dest_stack:   [dynamic]any,
+	status:       ParserStatus, // 4 bytes
+	dest:         any, // 16 bytes
+	key:          string, // 16 bytes
+	dest_stack:   [dynamic]any, // 40 bytes
 	key_stack:    [dynamic]string,
 	status_stack: [dynamic]ParserStatus,
 }
