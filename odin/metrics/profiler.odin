@@ -62,7 +62,7 @@ end_profiler :: proc() {
 
 	for i in 1 ..< global_profiler.anchor_index {
 		anchor := global_profiler.anchors[i]
-		print_time_elapsed(anchor.label, elapsed, anchor)
+		print_time_elapsed(anchor.label, elapsed, cpu_freq, anchor)
 	}
 }
 

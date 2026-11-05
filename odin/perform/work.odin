@@ -13,10 +13,13 @@ work :: proc(path: string) -> Error {
 
 	parsed: generator.Out
 	data: []byte
+	anchor_idx: int
 	{
-		metrics.profile("read")
+		_, anchor_idx, _ = metrics.profile("read")
 		data = os.read_entire_file("data/pairs.json", context.allocator) or_return
 	}
+
+	metrics.add_bandwith_data(anchor_idx, u64(len(data)))
 
 	{
 		metrics.profile("parse")
@@ -27,9 +30,9 @@ work :: proc(path: string) -> Error {
 	avg_haversine: f64
 
 	{
-		metrics.profile("calc")
-		haversine_sum: f64
+		_, anchor_idx, _ = metrics.profile("calc")
 
+		haversine_sum: f64
 		for pair, i in parsed.pairs {
 			haversine := calc.reference_haversine(pair.x0, pair.y0, pair.x1, pair.y1)
 			haversine_sum += haversine
@@ -37,6 +40,8 @@ work :: proc(path: string) -> Error {
 		}
 		avg_haversine = haversine_sum / f64(len(answers))
 	}
+
+	metrics.add_bandwith_data(anchor_idx, u64(size_of(generator.Pair) * len(parsed.pairs)))
 
 	{
 		metrics.profile("write")

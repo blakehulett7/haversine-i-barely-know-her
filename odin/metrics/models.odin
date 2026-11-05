@@ -7,10 +7,9 @@ profiler :: struct {
 }
 
 anchor :: struct {
-	parent_index:      int, // 4 bytes
-	start:             i64, // 8 bytes
 	elapsed_inclusive: i64,
 	elapsed_exclusive: i64,
 	hits:              i64,
+	processed_bytes:   u64,
 	label:             string, // 16 bytes
 }
