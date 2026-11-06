@@ -1,6 +1,7 @@
 package metrics
 
 import "core:fmt"
+import "core:sys/posix"
 foreign import libsystem "system:System.framework"
 
 mach_timebase_info_data_t :: struct {
@@ -37,6 +38,12 @@ get_os_time_freq :: proc() -> u64 {
 
 read_os_timer :: proc() -> u64 {
 	return mach_absolute_time()
+}
+
+read_page_faults :: proc() -> i64 {
+	usage: posix.rusage
+	posix.getrusage(posix.Which_Usage.SELF, &usage)
+	return usage.ru_minflt + usage.ru_majflt
 }
 
 os_time_test :: proc() {
