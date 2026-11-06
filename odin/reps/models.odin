@@ -1,5 +1,14 @@
 package main
 
+properties :: enum {
+	test_count,
+	bytes,
+	page_faults,
+	time,
+}
+
+repetition_metric :: [properties]u64
+
 test_mode :: enum {
 	uninitialized,
 	testing,
@@ -8,10 +17,9 @@ test_mode :: enum {
 }
 
 test_results :: struct {
-	max_time:   u64,
-	min_time:   u64,
-	test_count: u64,
-	total_time: u64,
+	max:   repetition_metric,
+	min:   repetition_metric,
+	total: repetition_metric,
 }
 
 tester :: struct {
@@ -19,10 +27,9 @@ tester :: struct {
 	closed_blocks:          u32,
 	open_blocks:            u32,
 	cpu_freq:               i64,
-	bytes_accumulated:      i64,
 	started_at:             i64,
 	target_processed_bytes: i64,
-	time_accumulated:       u64,
 	try_for:                i64,
+	accumulator:            repetition_metric,
 	results:                test_results,
 }

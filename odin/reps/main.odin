@@ -8,7 +8,7 @@ test_func :: struct {
 	func: read_func,
 }
 
-tests :: [?]test_func{{"read_entire_file", default}}
+tests :: [?]test_func{{"read_entire_file", default}, {"read + malloc", with_malloc}}
 path :: "../data/pairs.json"
 
 main :: proc() {
