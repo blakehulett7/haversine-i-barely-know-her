@@ -4,44 +4,26 @@ import "core:fmt"
 import "core:mem/virtual"
 import "core:os"
 
-read_func :: proc(t: ^tester, path: string)
+test_func :: proc(t: ^tester, path: string, with_malloc: bool)
 
-default :: proc(t: ^tester, path: string) {
-	for is_testing(t) {
-		begin_time(t)
-		data, err := os.read_entire_file(path, context.allocator)
-		end_time(t, u64(len(data)))
-
-		if t.target_processed_bytes == 0 {
-			t.target_processed_bytes = i64(len(data))
-			count_bytes(t, u64(len(data)))
-		}
-
-		defer delete(data)
-
-		if err != nil {
-			t.mode = .errored
-			continue
-		}
-		count_bytes(t, u64(len(data)))
-	}
-}
-
-with_malloc :: proc(t: ^tester, path: string) {
+default :: proc(t: ^tester, path: string, with_malloc: bool) {
 	arena: virtual.Arena
+	allocator := context.allocator
 
-	err := virtual.arena_init_growing(&arena)
-	if err != nil {
-		fmt.println("could not init growing arena")
-		return
+	if with_malloc {
+		err := virtual.arena_init_growing(&arena)
+		if err != nil {
+			fmt.println("could not init growing arena")
+			return
+		}
+		allocator = virtual.arena_allocator(&arena)
 	}
 
 	defer virtual.arena_destroy(&arena)
 
-
 	for is_testing(t) {
 		begin_time(t)
-		data, err := os.read_entire_file(path, virtual.arena_allocator(&arena))
+		data, err := os.read_entire_file(path, allocator)
 		end_time(t, u64(len(data)))
 
 		if t.target_processed_bytes == 0 {
@@ -55,11 +37,29 @@ with_malloc :: proc(t: ^tester, path: string) {
 		}
 		count_bytes(t, u64(len(data)))
 
-		free_all(virtual.arena_allocator(&arena))
+		if with_malloc {
+			free_all(allocator)
+		} else {
+			defer delete(data)
+		}
 	}
 }
 
-write_all_bytes :: proc(t: ^tester, path: string) {
+write_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
+	arena: virtual.Arena
+	allocator := context.allocator
+
+	if with_malloc {
+		err := virtual.arena_init_growing(&arena)
+		if err != nil {
+			fmt.println("could not init growing arena")
+			return
+		}
+		allocator = virtual.arena_allocator(&arena)
+	}
+
+	defer virtual.arena_destroy(&arena)
+
 	f, err := os.open(path)
 	if err != nil {
 		return
@@ -71,7 +71,7 @@ write_all_bytes :: proc(t: ^tester, path: string) {
 	}
 
 	for is_testing(t) {
-		dest := make([]byte, size)
+		dest := make([]byte, size, allocator)
 
 		begin_time(t)
 		for i in 0 ..< size {
@@ -85,6 +85,10 @@ write_all_bytes :: proc(t: ^tester, path: string) {
 		}
 		count_bytes(t, u64(size))
 
-		delete(dest)
+		if with_malloc {
+			free_all(allocator)
+		} else {
+			delete(dest)
+		}
 	}
 }
