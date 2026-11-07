@@ -40,7 +40,7 @@ default :: proc(t: ^tester, path: string, with_malloc: bool) {
 		if with_malloc {
 			free_all(allocator)
 		} else {
-			defer delete(data)
+			delete(data)
 		}
 	}
 }
@@ -76,6 +76,54 @@ write_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
 		begin_time(t)
 		for i in 0 ..< size {
 			dest[i] = byte(i)
+		}
+		end_time(t, u64(size))
+
+		if t.target_processed_bytes == 0 {
+			t.target_processed_bytes = size
+			count_bytes(t, u64(size))
+		}
+		count_bytes(t, u64(size))
+
+		if with_malloc {
+			free_all(allocator)
+		} else {
+			delete(dest)
+		}
+	}
+}
+
+write_all_bytes_backward :: proc(t: ^tester, path: string, with_malloc: bool) {
+	arena: virtual.Arena
+	allocator := context.allocator
+
+	if with_malloc {
+		err := virtual.arena_init_growing(&arena)
+		if err != nil {
+			fmt.println("could not init growing arena")
+			return
+		}
+		allocator = virtual.arena_allocator(&arena)
+	}
+
+	defer virtual.arena_destroy(&arena)
+
+	f, err := os.open(path)
+	if err != nil {
+		return
+	}
+
+	size, s_err := os.file_size(f)
+	if s_err != nil {
+		return
+	}
+
+	for is_testing(t) {
+		dest := make([]byte, size, allocator)
+
+		begin_time(t)
+		for i in 0 ..< size {
+			dest[(len(dest) - 1) - int(i)] = byte(i)
 		}
 		end_time(t, u64(size))
 
