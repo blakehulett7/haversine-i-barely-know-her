@@ -70,6 +70,8 @@ write_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
 		return
 	}
 
+	t.target_processed_bytes = size
+
 	for is_testing(t) {
 		dest := make([]byte, size, allocator)
 
@@ -79,10 +81,6 @@ write_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
 		}
 		end_time(t, u64(size))
 
-		if t.target_processed_bytes == 0 {
-			t.target_processed_bytes = size
-			count_bytes(t, u64(size))
-		}
 		count_bytes(t, u64(size))
 
 		if with_malloc {
