@@ -10,11 +10,13 @@ repetition_test :: struct {
 }
 
 tests :: [?]repetition_test {
-	{"write_all", write_all_bytes, false},
-	{"mov_all_bytes", mov_all_bytes, false},
-	{"nop_all_bytes", nop_all_bytes, false},
-	{"cmp_all_bytes", cmp_all_bytes, false},
-	{"dec_all_bytes", dec_all_bytes, false},
+	{"nop_x9", nop_x9, false},
+	{"nop_x18", nop_x18, false},
+	{"nop_4x1", nop_4x1, false},
+	{"nop_4x3", nop_4x3, false},
+	{"nop_4x9", nop_4x9, false},
+	{"nop_x1", nop_x1, false},
+	{"nop_x3", nop_x3, false},
 }
 path :: "../data/pairs.json"
 

@@ -4,13 +4,21 @@ import "core:fmt"
 import "core:mem/virtual"
 import "core:os"
 
-foreign import lib "../asm/lib/front_end_test.a"
+foreign import lib {"../asm/lib/front_end_test.a", "../asm/lib/nop_test.a"}
 
 foreign lib {
 	MOVAllBytesASM :: proc(dest: ^byte, count: uint) ---
 	NOPAllBytesASM :: proc(dest: ^byte, count: uint) ---
 	CMPAllBytesASM :: proc(dest: ^byte, count: uint) ---
 	DECAllBytesASM :: proc(dest: ^byte, count: uint) ---
+
+	NOP4x1AllBytesASM :: proc(dest: ^byte, count: uint) ---
+	NOP4x3AllBytesASM :: proc(dest: ^byte, count: uint) ---
+	NOP4x9AllBytesASM :: proc(dest: ^byte, count: uint) ---
+	NOPx1AllBytesASM :: proc(dest: ^byte, count: uint) ---
+	NOPx3AllBytesASM :: proc(dest: ^byte, count: uint) ---
+	NOPx9AllBytesASM :: proc(dest: ^byte, count: uint) ---
+	NOPx18AllBytesASM :: proc(dest: ^byte, count: uint) ---
 }
 
 asm_func :: proc "cdecl" (dest: ^byte, count: uint)
@@ -150,15 +158,7 @@ write_all_bytes_backward :: proc(t: ^tester, path: string, with_malloc: bool) {
 }
 
 custom_asm :: proc(t: ^tester, path: string, func: asm_func) {
-	f, err := os.open(path)
-	if err != nil {
-		return
-	}
-
-	size, s_err := os.file_size(f)
-	if s_err != nil {
-		return
-	}
+	size: i64 = 1024 * 1024 * 1024
 
 	for is_testing(t) {
 		dest := make([]byte, size)
@@ -191,4 +191,32 @@ cmp_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
 
 dec_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, DECAllBytesASM)
+}
+
+nop_4x1 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, NOP4x1AllBytesASM)
+}
+
+nop_4x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, NOP4x3AllBytesASM)
+}
+
+nop_4x9 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, NOP4x9AllBytesASM)
+}
+
+nop_x1 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, NOPx1AllBytesASM)
+}
+
+nop_x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, NOPx3AllBytesASM)
+}
+
+nop_x9 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, NOPx9AllBytesASM)
+}
+
+nop_x18 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, NOPx18AllBytesASM)
 }
