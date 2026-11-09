@@ -13,6 +13,7 @@ foreign lib {
 	DECAllBytesASM :: proc(dest: ^byte, count: uint) ---
 }
 
+asm_func :: proc "cdecl" (dest: ^byte, count: uint)
 test_func :: proc(t: ^tester, path: string, with_malloc: bool)
 
 default :: proc(t: ^tester, path: string, with_malloc: bool) {
@@ -148,7 +149,7 @@ write_all_bytes_backward :: proc(t: ^tester, path: string, with_malloc: bool) {
 	}
 }
 
-mov_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
+custom_asm :: proc(t: ^tester, path: string, func: asm_func) {
 	f, err := os.open(path)
 	if err != nil {
 		return
@@ -163,7 +164,7 @@ mov_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
 		dest := make([]byte, size)
 
 		begin_time(t)
-		MOVAllBytesASM(raw_data(dest), uint(size))
+		func(raw_data(dest), uint(size))
 		end_time(t, u64(size))
 
 		if t.target_processed_bytes == 0 {
@@ -174,88 +175,20 @@ mov_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
 
 		delete(dest)
 	}
+}
+
+mov_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, MOVAllBytesASM)
 }
 
 nop_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
-	f, err := os.open(path)
-	if err != nil {
-		return
-	}
-
-	size, s_err := os.file_size(f)
-	if s_err != nil {
-		return
-	}
-
-	for is_testing(t) {
-		dest := make([]byte, size)
-
-		begin_time(t)
-		NOPAllBytesASM(raw_data(dest), uint(size))
-		end_time(t, u64(size))
-
-		if t.target_processed_bytes == 0 {
-			t.target_processed_bytes = size
-			count_bytes(t, u64(size))
-		}
-		count_bytes(t, u64(size))
-
-		delete(dest)
-	}
+	custom_asm(t, path, NOPAllBytesASM)
 }
 
 cmp_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
-	f, err := os.open(path)
-	if err != nil {
-		return
-	}
-
-	size, s_err := os.file_size(f)
-	if s_err != nil {
-		return
-	}
-
-	for is_testing(t) {
-		dest := make([]byte, size)
-
-		begin_time(t)
-		CMPAllBytesASM(raw_data(dest), uint(size))
-		end_time(t, u64(size))
-
-		if t.target_processed_bytes == 0 {
-			t.target_processed_bytes = size
-			count_bytes(t, u64(size))
-		}
-		count_bytes(t, u64(size))
-
-		delete(dest)
-	}
+	custom_asm(t, path, CMPAllBytesASM)
 }
 
 dec_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
-	f, err := os.open(path)
-	if err != nil {
-		return
-	}
-
-	size, s_err := os.file_size(f)
-	if s_err != nil {
-		return
-	}
-
-	for is_testing(t) {
-		dest := make([]byte, size)
-
-		begin_time(t)
-		DECAllBytesASM(raw_data(dest), uint(size))
-		end_time(t, u64(size))
-
-		if t.target_processed_bytes == 0 {
-			t.target_processed_bytes = size
-			count_bytes(t, u64(size))
-		}
-		count_bytes(t, u64(size))
-
-		delete(dest)
-	}
+	custom_asm(t, path, DECAllBytesASM)
 }
