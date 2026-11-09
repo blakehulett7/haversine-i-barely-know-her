@@ -4,6 +4,15 @@ import "core:fmt"
 import "core:mem/virtual"
 import "core:os"
 
+foreign import lib "../asm/lib/front_end_test.a"
+
+foreign lib {
+	MOVAllBytesASM :: proc(dest: ^byte, count: uint) ---
+	NOPAllBytesASM :: proc(dest: ^byte, count: uint) ---
+	CMPAllBytesASM :: proc(dest: ^byte, count: uint) ---
+	DECAllBytesASM :: proc(dest: ^byte, count: uint) ---
+}
+
 test_func :: proc(t: ^tester, path: string, with_malloc: bool)
 
 default :: proc(t: ^tester, path: string, with_malloc: bool) {
@@ -136,5 +145,117 @@ write_all_bytes_backward :: proc(t: ^tester, path: string, with_malloc: bool) {
 		} else {
 			delete(dest)
 		}
+	}
+}
+
+mov_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
+	f, err := os.open(path)
+	if err != nil {
+		return
+	}
+
+	size, s_err := os.file_size(f)
+	if s_err != nil {
+		return
+	}
+
+	for is_testing(t) {
+		dest := make([]byte, size)
+
+		begin_time(t)
+		MOVAllBytesASM(raw_data(dest), uint(size))
+		end_time(t, u64(size))
+
+		if t.target_processed_bytes == 0 {
+			t.target_processed_bytes = size
+			count_bytes(t, u64(size))
+		}
+		count_bytes(t, u64(size))
+
+		delete(dest)
+	}
+}
+
+nop_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
+	f, err := os.open(path)
+	if err != nil {
+		return
+	}
+
+	size, s_err := os.file_size(f)
+	if s_err != nil {
+		return
+	}
+
+	for is_testing(t) {
+		dest := make([]byte, size)
+
+		begin_time(t)
+		NOPAllBytesASM(raw_data(dest), uint(size))
+		end_time(t, u64(size))
+
+		if t.target_processed_bytes == 0 {
+			t.target_processed_bytes = size
+			count_bytes(t, u64(size))
+		}
+		count_bytes(t, u64(size))
+
+		delete(dest)
+	}
+}
+
+cmp_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
+	f, err := os.open(path)
+	if err != nil {
+		return
+	}
+
+	size, s_err := os.file_size(f)
+	if s_err != nil {
+		return
+	}
+
+	for is_testing(t) {
+		dest := make([]byte, size)
+
+		begin_time(t)
+		CMPAllBytesASM(raw_data(dest), uint(size))
+		end_time(t, u64(size))
+
+		if t.target_processed_bytes == 0 {
+			t.target_processed_bytes = size
+			count_bytes(t, u64(size))
+		}
+		count_bytes(t, u64(size))
+
+		delete(dest)
+	}
+}
+
+dec_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
+	f, err := os.open(path)
+	if err != nil {
+		return
+	}
+
+	size, s_err := os.file_size(f)
+	if s_err != nil {
+		return
+	}
+
+	for is_testing(t) {
+		dest := make([]byte, size)
+
+		begin_time(t)
+		DECAllBytesASM(raw_data(dest), uint(size))
+		end_time(t, u64(size))
+
+		if t.target_processed_bytes == 0 {
+			t.target_processed_bytes = size
+			count_bytes(t, u64(size))
+		}
+		count_bytes(t, u64(size))
+
+		delete(dest)
 	}
 }

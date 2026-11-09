@@ -11,9 +11,10 @@ repetition_test :: struct {
 
 tests :: [?]repetition_test {
 	{"write_all", write_all_bytes, false},
-	{"write_all", write_all_bytes, true},
-	{"read_entire_file", default, false},
-	{"read_entire_file", default, true},
+	{"mov_all_bytes", mov_all_bytes, false},
+	{"nop_all_bytes", nop_all_bytes, false},
+	{"cmp_all_bytes", cmp_all_bytes, false},
+	{"dec_all_bytes", dec_all_bytes, false},
 }
 path :: "../data/pairs.json"
 
