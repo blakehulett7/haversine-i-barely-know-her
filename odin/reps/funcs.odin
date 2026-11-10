@@ -4,7 +4,7 @@ import "core:fmt"
 import "core:mem/virtual"
 import "core:os"
 
-foreign import lib {"../asm/lib/front_end_test.a", "../asm/lib/nop_test.a"}
+foreign import lib {"../asm/lib/front_end_test.a", "../asm/lib/nop_test.a", "../asm/lib/conditional_nop_test.a"}
 
 foreign lib {
 	MOVAllBytesASM :: proc(dest: ^byte, count: uint) ---
@@ -19,6 +19,8 @@ foreign lib {
 	NOPx3AllBytesASM :: proc(dest: ^byte, count: uint) ---
 	NOPx9AllBytesASM :: proc(dest: ^byte, count: uint) ---
 	NOPx18AllBytesASM :: proc(dest: ^byte, count: uint) ---
+
+	ConditionalNOP :: proc(dest: ^byte, count: uint) ---
 }
 
 asm_func :: proc "cdecl" (dest: ^byte, count: uint)
@@ -219,4 +221,20 @@ nop_x9 :: proc(t: ^tester, path: string, with_malloc: bool) {
 
 nop_x18 :: proc(t: ^tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, NOPx18AllBytesASM)
+}
+
+conditional_nop :: proc(t: ^tester, dest: []byte) {
+	size := i64(len(dest))
+
+	for is_testing(t) {
+		begin_time(t)
+		ConditionalNOP(raw_data(dest), uint(size))
+		end_time(t, u64(size))
+
+		if t.target_processed_bytes == 0 {
+			t.target_processed_bytes = size
+			count_bytes(t, u64(size))
+		}
+		count_bytes(t, u64(size))
+	}
 }

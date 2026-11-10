@@ -9,6 +9,8 @@ repetition_test :: struct {
 	with_malloc: bool,
 }
 
+gb := 1024 * 1024 * 1024
+
 tests :: [?]repetition_test {
 	{"nop_x9", nop_x9, false},
 	{"nop_x18", nop_x18, false},
@@ -21,6 +23,10 @@ tests :: [?]repetition_test {
 path :: "../data/pairs.json"
 
 main :: proc() {
+	nop_test()
+	return
+
+	/*
 	testers: [len(tests)]tester
 	cpu_freq := intrinsics.read_cycle_counter_frequency()
 
@@ -34,6 +40,26 @@ main :: proc() {
 			t := testers[i]
 			start_wave(&t, cpu_freq)
 			test.func(&t, path, test.with_malloc)
+		}
+	}
+    */
+}
+
+nop_test :: proc() {
+	testers: [branch_pattern]tester
+	cpu_freq := intrinsics.read_cycle_counter_frequency()
+
+	for {
+		for pattern in branch_pattern {
+			buffer := make([]byte, 1024 * 1024 * 1024)
+			fill_buffer(buffer, pattern)
+			fmt.printf("\n--- conditional_nop, %s ---\n", pattern)
+
+			t := testers[pattern]
+			start_wave(&t, cpu_freq)
+			conditional_nop(&t, buffer)
+
+			delete(buffer)
 		}
 	}
 }
