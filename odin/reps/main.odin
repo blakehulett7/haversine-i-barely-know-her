@@ -11,13 +11,7 @@ repetition_test :: struct {
 
 gb := 1024 * 1024 * 1024
 
-tests :: [?]repetition_test {
-	{"aligned 64", alignment_64, false},
-	{"aligned 4", alignment_4, false},
-	{"aligned 16", alignment_16, false},
-	{"aligned 32", alignment_32, false},
-	{"aligned 60", alignment_60, false},
-}
+tests :: [?]repetition_test{{"rat_add", rat_add, false}, {"rat_mov_add", rat_mov_add, false}}
 path :: "../data/pairs.json"
 
 main :: proc() {

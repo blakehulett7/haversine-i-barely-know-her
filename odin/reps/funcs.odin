@@ -4,7 +4,7 @@ import "core:fmt"
 import "core:mem/virtual"
 import "core:os"
 
-foreign import lib {"../asm/lib/front_end_test.a", "../asm/lib/nop_test.a", "../asm/lib/conditional_nop_test.a", "../asm/lib/alignment_test.a"}
+foreign import lib {"../asm/lib/front_end_test.a", "../asm/lib/nop_test.a", "../asm/lib/conditional_nop_test.a", "../asm/lib/alignment_test.a", "../asm/lib/rat_test.a"}
 
 foreign lib {
 	MOVAllBytesASM :: proc(dest: ^byte, count: uint) ---
@@ -27,6 +27,9 @@ foreign lib {
 	NOPAligned16 :: proc(count: uint) ---
 	NOPAligned32 :: proc(count: uint) ---
 	NOPAligned60 :: proc(count: uint) ---
+
+	RATAdd :: proc(count: uint) ---
+	RATMovAdd :: proc(count: uint) ---
 }
 
 alignment_test :: proc "cdecl" (count: uint)
@@ -280,4 +283,12 @@ alignment_32 :: proc(t: ^tester, path: string, with_malloc: bool) {
 
 alignment_60 :: proc(t: ^tester, path: string, with_malloc: bool) {
 	custom_alignment_test(t, path, NOPAligned60)
+}
+
+rat_add :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_alignment_test(t, path, RATAdd)
+}
+
+rat_mov_add :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_alignment_test(t, path, RATMovAdd)
 }
