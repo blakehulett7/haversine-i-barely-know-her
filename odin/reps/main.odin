@@ -12,21 +12,15 @@ repetition_test :: struct {
 gb := 1024 * 1024 * 1024
 
 tests :: [?]repetition_test {
-	{"nop_x9", nop_x9, false},
-	{"nop_x18", nop_x18, false},
-	{"nop_4x1", nop_4x1, false},
-	{"nop_4x3", nop_4x3, false},
-	{"nop_4x9", nop_4x9, false},
-	{"nop_x1", nop_x1, false},
-	{"nop_x3", nop_x3, false},
+	{"aligned 64", alignment_64, false},
+	{"aligned 4", alignment_4, false},
+	{"aligned 16", alignment_16, false},
+	{"aligned 32", alignment_32, false},
+	{"aligned 60", alignment_60, false},
 }
 path :: "../data/pairs.json"
 
 main :: proc() {
-	nop_test()
-	return
-
-	/*
 	testers: [len(tests)]tester
 	cpu_freq := intrinsics.read_cycle_counter_frequency()
 
@@ -42,7 +36,6 @@ main :: proc() {
 			test.func(&t, path, test.with_malloc)
 		}
 	}
-    */
 }
 
 nop_test :: proc() {

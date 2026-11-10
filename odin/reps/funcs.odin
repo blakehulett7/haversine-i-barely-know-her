@@ -4,7 +4,7 @@ import "core:fmt"
 import "core:mem/virtual"
 import "core:os"
 
-foreign import lib {"../asm/lib/front_end_test.a", "../asm/lib/nop_test.a", "../asm/lib/conditional_nop_test.a"}
+foreign import lib {"../asm/lib/front_end_test.a", "../asm/lib/nop_test.a", "../asm/lib/conditional_nop_test.a", "../asm/lib/alignment_test.a"}
 
 foreign lib {
 	MOVAllBytesASM :: proc(dest: ^byte, count: uint) ---
@@ -21,8 +21,15 @@ foreign lib {
 	NOPx18AllBytesASM :: proc(dest: ^byte, count: uint) ---
 
 	ConditionalNOP :: proc(dest: ^byte, count: uint) ---
+
+	NOPAligned64 :: proc(count: uint) ---
+	NOPAligned4 :: proc(count: uint) ---
+	NOPAligned16 :: proc(count: uint) ---
+	NOPAligned32 :: proc(count: uint) ---
+	NOPAligned60 :: proc(count: uint) ---
 }
 
+alignment_test :: proc "cdecl" (count: uint)
 asm_func :: proc "cdecl" (dest: ^byte, count: uint)
 test_func :: proc(t: ^tester, path: string, with_malloc: bool)
 
@@ -179,6 +186,22 @@ custom_asm :: proc(t: ^tester, path: string, func: asm_func) {
 	}
 }
 
+custom_alignment_test :: proc(t: ^tester, path: string, func: alignment_test) {
+	count: u64 = 1024 * 1024 * 1024
+
+	for is_testing(t) {
+		begin_time(t)
+		func(uint(count))
+		end_time(t, count)
+
+		if t.target_processed_bytes == 0 {
+			t.target_processed_bytes = i64(count)
+			count_bytes(t, count)
+		}
+		count_bytes(t, count)
+	}
+}
+
 mov_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, MOVAllBytesASM)
 }
@@ -237,4 +260,24 @@ conditional_nop :: proc(t: ^tester, dest: []byte) {
 		}
 		count_bytes(t, u64(size))
 	}
+}
+
+alignment_64 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_alignment_test(t, path, NOPAligned64)
+}
+
+alignment_4 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_alignment_test(t, path, NOPAligned4)
+}
+
+alignment_16 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_alignment_test(t, path, NOPAligned16)
+}
+
+alignment_32 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_alignment_test(t, path, NOPAligned32)
+}
+
+alignment_60 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_alignment_test(t, path, NOPAligned60)
 }
