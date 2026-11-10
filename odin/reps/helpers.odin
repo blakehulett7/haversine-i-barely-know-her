@@ -30,5 +30,7 @@ fill_buffer :: proc(dest: []byte, pattern: branch_pattern) {
 		case .mathrand:
 		case .cryptrand:
 		}
+
+		dest[i] = value
 	}
 }

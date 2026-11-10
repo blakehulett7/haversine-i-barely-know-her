@@ -54,6 +54,8 @@ nop_test :: proc() {
 			buffer := make([]byte, 1024 * 1024 * 1024)
 			fill_buffer(buffer, pattern)
 			fmt.printf("\n--- conditional_nop, %s ---\n", pattern)
+			fmt.println(buffer[:32])
+			fmt.println(buffer[len(buffer) - 32:])
 
 			t := testers[pattern]
 			start_wave(&t, cpu_freq)
