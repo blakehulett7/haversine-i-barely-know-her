@@ -10,8 +10,8 @@
 _Read_4x3:
 .loop4:
     ldr w2, [x0]
-    ldr w2, [x0]
-    ldr w2, [x0]
+    ldr w2, [x0, #4]
+    ldr w2, [x0, #8]
     subs x1, x1, #12
     b.hi .loop4
     ret
@@ -19,8 +19,8 @@ _Read_4x3:
 _Read_8x3:
 .loop8:
     ldr x2, [x0]
-    ldr x2, [x0]
-    ldr x2, [x0]
+    ldr x2, [x0, #8]
+    ldr x2, [x0, #16]
     subs x1, x1, #24
     b.hi .loop8
     ret
@@ -28,7 +28,7 @@ _Read_8x3:
 _Read_16x2:
 .loop16x2:
     ldr q0, [x0]
-    ldr q0, [x0]
+    ldr q0, [x0, #16]
     subs x1, x1, #32
     b.hi .loop16x2
     ret
@@ -36,8 +36,8 @@ _Read_16x2:
 _Read_16x3:
 .loop16:
     ldr q0, [x0]
-    ldr q0, [x0]
-    ldr q0, [x0]
+    ldr q0, [x0, #16]
+    ldr q0, [x0, #32]
     subs x1, x1, #48
     b.hi .loop16
     ret
@@ -45,7 +45,7 @@ _Read_16x3:
 _Read_32x2:
 .loop32x2:
     ldp q0, q1, [x0]
-    ldp q0, q1, [x0]
+    ldp q0, q1, [x0, #32]
     subs x1, x1, #64
     b.hi .loop32x2
     ret
@@ -54,8 +54,8 @@ _Read_32x2:
 _Read_32x3:
 .loop32:
     ldp q0, q1, [x0]
-    ldp q0, q1, [x0]
-    ldp q0, q1, [x0]
+    ldp q0, q1, [x0, #32]
+    ldp q0, q1, [x0, #64]
     subs x1, x1, #96
     b.hi .loop32
     ret
