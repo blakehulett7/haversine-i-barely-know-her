@@ -1,6 +1,8 @@
 .global _Read_4x3
 .global _Read_8x3
+.global _Read_16x2
 .global _Read_16x3
+.global _Read_32x2
 .global _Read_32x3
 .global _Read_64x3
 .text
@@ -23,6 +25,14 @@ _Read_8x3:
     b.hi .loop8
     ret
 
+_Read_16x2:
+.loop16x2:
+    ldr q0, [x0]
+    ldr q0, [x0]
+    subs x1, x1, #32
+    b.hi .loop16x2
+    ret
+
 _Read_16x3:
 .loop16:
     ldr q0, [x0]
@@ -31,6 +41,15 @@ _Read_16x3:
     subs x1, x1, #48
     b.hi .loop16
     ret
+
+_Read_32x2:
+.loop32x2:
+    ldp q0, q1, [x0]
+    ldp q0, q1, [x0]
+    subs x1, x1, #64
+    b.hi .loop32x2
+    ret
+
 
 _Read_32x3:
 .loop32:

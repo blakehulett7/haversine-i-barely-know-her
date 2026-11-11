@@ -37,6 +37,8 @@ binaries
 temp
 test
 
+reps/reps
+
 # Editor/IDE
 # .idea/
 # .vscode/

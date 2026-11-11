@@ -42,7 +42,9 @@ foreign lib {
 
 	Read_4x3 :: proc(dest: ^byte, count: uint) ---
 	Read_8x3 :: proc(dest: ^byte, count: uint) ---
+	Read_16x2 :: proc(dest: ^byte, count: uint) ---
 	Read_16x3 :: proc(dest: ^byte, count: uint) ---
+	Read_32x2 :: proc(dest: ^byte, count: uint) ---
 	Read_32x3 :: proc(dest: ^byte, count: uint) ---
 	Read_64x3 :: proc(dest: ^byte, count: uint) ---
 }
@@ -294,6 +296,34 @@ write_x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
 
 write_x4 :: proc(t: ^tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Write_x4)
+}
+
+read_4x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Read_4x3)
+}
+
+read_8x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Read_8x3)
+}
+
+read_16x2 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Read_16x2)
+}
+
+read_16x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Read_16x3)
+}
+
+read_32x2 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Read_32x2)
+}
+
+read_32x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Read_32x3)
+}
+
+read_64x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Read_64x3)
 }
 
 conditional_nop :: proc(t: ^tester, dest: []byte) {
