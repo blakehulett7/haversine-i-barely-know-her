@@ -4,7 +4,7 @@ import "core:fmt"
 import "core:mem/virtual"
 import "core:os"
 
-foreign import lib {"../asm/lib/front_end_test.a", "../asm/lib/nop_test.a", "../asm/lib/conditional_nop_test.a", "../asm/lib/alignment_test.a", "../asm/lib/rat_test.a", "../asm/lib/ports_test.a", "../asm/lib/simd_test.a"}
+foreign import lib {"../asm/lib/front_end_test.a", "../asm/lib/nop_test.a", "../asm/lib/conditional_nop_test.a", "../asm/lib/alignment_test.a", "../asm/lib/rat_test.a", "../asm/lib/ports_test.a", "../asm/lib/simd_test.a", "../asm/lib/cache_test.a"}
 
 foreign lib {
 	MOVAllBytesASM :: proc(dest: ^byte, count: uint) ---
@@ -47,6 +47,13 @@ foreign lib {
 	Read_32x2 :: proc(dest: ^byte, count: uint) ---
 	Read_32x3 :: proc(dest: ^byte, count: uint) ---
 	Read_64x3 :: proc(dest: ^byte, count: uint) ---
+
+	Cache_4K :: proc(dest: ^byte, count: uint) ---
+	Cache_64K :: proc(dest: ^byte, count: uint) ---
+	Cache_1M :: proc(dest: ^byte, count: uint) ---
+	Cache_16M :: proc(dest: ^byte, count: uint) ---
+	Cache_256M :: proc(dest: ^byte, count: uint) ---
+	Cache_4G :: proc(dest: ^byte, count: uint) ---
 }
 
 alignment_test :: proc "cdecl" (count: uint)
@@ -187,7 +194,7 @@ write_all_bytes_backward :: proc(t: ^tester, path: string, with_malloc: bool) {
 }
 
 custom_asm :: proc(t: ^tester, path: string, func: asm_func) {
-	size: i64 = 1024 * 1024 * 1024
+	size: i64 = 4 * 1024 * 1024 * 1024
 
 	for is_testing(t) {
 		dest := make([]byte, size)
@@ -324,6 +331,30 @@ read_32x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
 
 read_64x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Read_64x3)
+}
+
+cache_4k :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Cache_4K)
+}
+
+cache_64k :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Cache_64K)
+}
+
+cache_1m :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Cache_1M)
+}
+
+cache_16m :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Cache_16M)
+}
+
+cache_256m :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Cache_256M)
+}
+
+cache_4g :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Cache_4G)
 }
 
 conditional_nop :: proc(t: ^tester, dest: []byte) {

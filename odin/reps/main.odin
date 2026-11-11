@@ -12,13 +12,12 @@ repetition_test :: struct {
 gb := 1024 * 1024 * 1024
 
 tests :: [?]repetition_test {
-	{"read_4x3", read_4x3, false},
-	{"read_8x3", read_8x3, false},
-	{"read_16x2", read_16x2, false},
-	{"read_16x3", read_16x3, false},
-	{"read_32x2", read_32x2, false},
-	{"read_32x3", read_32x3, false},
-	{"read_64x3", read_64x3, false},
+	{"cache_4k", cache_4k, false},
+	{"cache_64k", cache_64k, false},
+	{"cache_1m", cache_1m, false},
+	{"cache_16m", cache_16m, false},
+	{"cache_256m", cache_256m, false},
+	{"cache_4g", cache_4g, false},
 }
 path :: "../data/pairs.json"
 
