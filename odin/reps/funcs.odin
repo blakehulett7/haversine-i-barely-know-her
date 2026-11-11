@@ -4,7 +4,7 @@ import "core:fmt"
 import "core:mem/virtual"
 import "core:os"
 
-foreign import lib {"../asm/lib/front_end_test.a", "../asm/lib/nop_test.a", "../asm/lib/conditional_nop_test.a", "../asm/lib/alignment_test.a", "../asm/lib/rat_test.a"}
+foreign import lib {"../asm/lib/front_end_test.a", "../asm/lib/nop_test.a", "../asm/lib/conditional_nop_test.a", "../asm/lib/alignment_test.a", "../asm/lib/rat_test.a", "../asm/lib/ports_test.a", "../asm/lib/simd_test.a"}
 
 foreign lib {
 	MOVAllBytesASM :: proc(dest: ^byte, count: uint) ---
@@ -30,6 +30,21 @@ foreign lib {
 
 	RATAdd :: proc(count: uint) ---
 	RATMovAdd :: proc(count: uint) ---
+
+	Read_x1 :: proc(dest: ^byte, count: uint) ---
+	Read_x2 :: proc(dest: ^byte, count: uint) ---
+	Read_x3 :: proc(dest: ^byte, count: uint) ---
+	Read_x4 :: proc(dest: ^byte, count: uint) ---
+	Write_x1 :: proc(dest: ^byte, count: uint) ---
+	Write_x2 :: proc(dest: ^byte, count: uint) ---
+	Write_x3 :: proc(dest: ^byte, count: uint) ---
+	Write_x4 :: proc(dest: ^byte, count: uint) ---
+
+	Read_4x3 :: proc(dest: ^byte, count: uint) ---
+	Read_8x3 :: proc(dest: ^byte, count: uint) ---
+	Read_16x3 :: proc(dest: ^byte, count: uint) ---
+	Read_32x3 :: proc(dest: ^byte, count: uint) ---
+	Read_64x3 :: proc(dest: ^byte, count: uint) ---
 }
 
 alignment_test :: proc "cdecl" (count: uint)
@@ -247,6 +262,38 @@ nop_x9 :: proc(t: ^tester, path: string, with_malloc: bool) {
 
 nop_x18 :: proc(t: ^tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, NOPx18AllBytesASM)
+}
+
+read_x1 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Read_x1)
+}
+
+read_x2 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Read_x2)
+}
+
+read_x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Read_x3)
+}
+
+read_x4 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Read_x4)
+}
+
+write_x1 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Write_x1)
+}
+
+write_x2 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Write_x2)
+}
+
+write_x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Write_x3)
+}
+
+write_x4 :: proc(t: ^tester, path: string, with_malloc: bool) {
+	custom_asm(t, path, Write_x4)
 }
 
 conditional_nop :: proc(t: ^tester, dest: []byte) {

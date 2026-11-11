@@ -11,7 +11,16 @@ repetition_test :: struct {
 
 gb := 1024 * 1024 * 1024
 
-tests :: [?]repetition_test{{"rat_add", rat_add, false}, {"rat_mov_add", rat_mov_add, false}}
+tests :: [?]repetition_test {
+	{"read_x1", read_x1, false},
+	{"read_x2", read_x2, false},
+	{"read_x3", read_x3, false},
+	{"read_x4", read_x4, false},
+	{"write_x1", write_x1, false},
+	{"write_x2", write_x2, false},
+	{"write_x3", write_x3, false},
+	{"write_x4", write_x4, false},
+}
 path :: "../data/pairs.json"
 
 main :: proc() {
