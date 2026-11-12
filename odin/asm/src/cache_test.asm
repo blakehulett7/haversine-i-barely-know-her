@@ -1,3 +1,4 @@
+.global _Cache
 .global _Cache_4K
 .global _Cache_64K
 .global _Cache_1M
@@ -6,7 +7,26 @@
 .global _Cache_4G
 .text
 
-// x0 is dest ptr, x1 is count
+// x0 is dest ptr, x1 is count, x2 is mask
+
+_Cache:
+    mov x3, #0
+    mov x4, x0
+    .p2align 6
+.loop:
+    ldp q0, q1, [x4]
+    ldp q0, q1, [x4, #32]
+    ldp q0, q1, [x4, #64]
+
+    add x3, x3, #96
+    and x3, x3, x2
+    mov x4, x0
+    add x4, x4, x3
+
+    subs x1, x1, #96
+    b.hi .loop
+
+    ret
 
 _Cache_4K:
     mov x3, #0

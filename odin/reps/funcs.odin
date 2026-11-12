@@ -1,6 +1,7 @@
 package main
 
 import "core:fmt"
+import "core:math"
 import "core:mem/virtual"
 import "core:os"
 
@@ -54,10 +55,13 @@ foreign lib {
 	Cache_16M :: proc(dest: ^byte, count: uint) ---
 	Cache_256M :: proc(dest: ^byte, count: uint) ---
 	Cache_4G :: proc(dest: ^byte, count: uint) ---
+
+	Cache :: proc(dest: ^byte, count, mask: uint) ---
 }
 
 alignment_test :: proc "cdecl" (count: uint)
 asm_func :: proc "cdecl" (dest: ^byte, count: uint)
+cache_func :: proc(t: ^tester, dest: []byte, mask: uint)
 test_func :: proc(t: ^tester, path: string, with_malloc: bool)
 
 default :: proc(t: ^tester, path: string, with_malloc: bool) {
@@ -210,6 +214,23 @@ custom_asm :: proc(t: ^tester, path: string, func: asm_func) {
 		count_bytes(t, u64(size))
 
 		delete(dest)
+	}
+}
+
+custom_cache :: proc(t: ^tester, dest: []byte, mask: uint) {
+	count: u64 = 4 * 1024 * 1024 * 1024
+	bits := 1 << mask
+
+	for is_testing(t) {
+		begin_time(t)
+		Cache(raw_data(dest), uint(count), uint(bits))
+		end_time(t, count)
+
+		if t.target_processed_bytes == 0 {
+			t.target_processed_bytes = i64(count)
+			count_bytes(t, count)
+		}
+		count_bytes(t, count)
 	}
 }
 
