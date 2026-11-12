@@ -32,6 +32,8 @@ go.work.sum
 *.txt
 *.dsym/
 
+*.a
+*.o
 *.bin
 bin
 binaries
