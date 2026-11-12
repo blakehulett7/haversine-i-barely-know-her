@@ -29,6 +29,7 @@ go.work.sum
 
 *.json
 *.f64
+*.txt
 *.dsym/
 
 *.bin
@@ -37,8 +38,8 @@ binaries
 temp
 test
 
-odin
-reps/reps
+odin/reps/reps
+odin/odin
 
 # Editor/IDE
 # .idea/
