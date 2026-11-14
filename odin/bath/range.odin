@@ -23,7 +23,8 @@ asin :: proc(t: ^domain_tracker, x: f64) -> f64 {
 }
 
 cos :: proc(t: ^domain_tracker, x: f64) -> f64 {
-	track(&t.cos, x)
+	domain := &t.cos
+	track(domain, x)
 	return math.cos(x)
 }
 

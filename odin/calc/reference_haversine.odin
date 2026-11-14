@@ -15,10 +15,10 @@ radians_from_degrees :: proc(degrees: f64) -> f64 {
 earth_radius :: 6372.8
 
 reference_haversine :: proc(x0, y0, x1, y1: f64) -> f64 {
-	lat1 := y0
-	lat2 := y1
-	lon1 := x0
-	lon2 := x1
+	lat1 := x0
+	lat2 := x1
+	lon1 := y0
+	lon2 := y1
 
 	dLat := radians_from_degrees(lat2 - lat1)
 	dLon := radians_from_degrees(lon2 - lon1)
