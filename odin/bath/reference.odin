@@ -23,8 +23,10 @@ reference_haversine :: proc(t: ^domain_tracker, x0, y0, x1, y1: f64) -> f64 {
 	lat1 = radians_from_degrees(lat1)
 	lat2 = radians_from_degrees(lat2)
 
-	a := square(sin(t, dLat / 2.0)) + cos(t, lat1) * cos(t, lat2) * square(sin(t, dLon / 2))
-	c := 2.0 * asin(t, sqrt(t, a))
+	a :=
+		square(sin_tracker(t, dLat / 2.0)) +
+		cos_tracker(t, lat1) * cos_tracker(t, lat2) * square(sin_tracker(t, dLon / 2))
+	c := 2.0 * asin(t, sqrt_tracker(t, a))
 
 	print(t)
 
