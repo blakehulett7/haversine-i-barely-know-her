@@ -60,26 +60,14 @@ main :: proc() {
 	fmt.println("\n--- Sine ---")
 	for t in arbitrary_sine_tests {
 		fmt.printf("Depth %s: ", t.sine_name)
-		max_err, input := bath.test_math_arbitrary(
-			-math.PI,
-			math.PI,
-			math.sin_f64,
-			bath.sin_v5,
-			t.power,
-		)
+		max_err, input := bath.test_math_arbitrary(0, Half_PI, math.sin_f64, bath.sin_v4, t.power)
 		fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
 	}
 
 	fmt.println("\n--- Cos ---")
 	for t in arbitrary_sine_tests {
 		fmt.printf("Depth %s: ", t.cos_name)
-		max_err, input := bath.test_math_arbitrary(
-			-Half_PI,
-			Half_PI,
-			math.cos_f64,
-			bath.cos_v2,
-			t.power,
-		)
+		max_err, input := bath.test_math_arbitrary(0, Half_PI, math.cos_f64, bath.cos_v2, t.power)
 		fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
 	}
 

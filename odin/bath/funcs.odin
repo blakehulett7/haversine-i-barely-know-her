@@ -42,19 +42,11 @@ cos_tracker :: proc(t: ^domain_tracker, x: f64) -> f64 {
 }
 
 factorial :: proc(x: int) -> f64 {
-	res := x
-	for i := x; i > 0; i -= 1 {
+	res := 1
+	for i := x; i > 1; i -= 1 {
 		res *= i
 	}
 	return f64(res)
-}
-
-pow :: proc(x: f64, pow: int) -> f64 {
-	res: f64 = 1.0
-	for i in 0 ..< pow {
-		res *= x
-	}
-	return res
 }
 
 sin_v1 :: proc(x: f64) -> f64 {
@@ -75,18 +67,13 @@ sin_v3 :: proc(x: f64) -> f64 {
 }
 
 sin_v4 :: proc(x: f64, power: int) -> f64 {
-	exponent := power
-	if exponent % 2 != 0 {
-		exponent -= 1
-	}
-
 	res: f64 = 0.0
-	should_add := true
-	for i := 1; i <= exponent; i += 2 {
-		calc := (pow(x, i)) / (factorial(i))
-		calc = should_add ? calc : -calc
-		res += calc
-		should_add = !should_add
+	x2 := x * x
+	x_pow := x
+
+	for i := 1; i <= power; i += 2 {
+		res += x_pow * taylor_coefficient(i)
+		x_pow *= x2
 	}
 
 	return res
@@ -115,6 +102,11 @@ sqrt_tracker :: proc(t: ^domain_tracker, x: f64) -> f64 {
 	domain := &t.sqrt
 	track(domain, x)
 	return math.sqrt(x)
+}
+
+taylor_coefficient :: proc(x: int) -> f64 {
+	sign := ((x - 1) / 2) % 2 == 0 ? 1.0 : -1.0
+	return sign / factorial(x)
 }
 
 track :: proc(domain: ^domain, x: f64) {
