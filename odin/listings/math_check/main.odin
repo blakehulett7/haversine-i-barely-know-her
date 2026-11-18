@@ -57,7 +57,7 @@ main :: proc() {
 		fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
 	}
 
-	fmt.println("\n--- Sine ---")
+	fmt.println("\n--- Sine (Taylor) ---")
 	for t in arbitrary_sine_tests {
 		fmt.printf("Depth %s: ", t.sine_name)
 		max_err, input := bath.test_math_arbitrary(
@@ -65,6 +65,19 @@ main :: proc() {
 			math.PI,
 			math.sin_f64,
 			bath.sin_v5,
+			t.power,
+		)
+		fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
+	}
+
+	fmt.println("\n--- Sine (Horner) ---")
+	for t in arbitrary_sine_tests {
+		fmt.printf("Depth %s: ", t.sine_name)
+		max_err, input := bath.test_math_arbitrary(
+			-math.PI,
+			math.PI,
+			math.sin_f64,
+			bath.sin_v6,
 			t.power,
 		)
 		fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)

@@ -49,6 +49,18 @@ factorial :: proc(x: int) -> f64 {
 	return f64(res)
 }
 
+horner_sine :: proc(x: f64, pow: int) -> f64 {
+	a := taylor_coefficient(pow)
+	x2 := x * x
+	exp := pow - 2
+
+	res := taylor_coefficient(exp)
+	for exp -= 2; exp > 0; exp -= 2 {
+		res = res * x2 + taylor_coefficient(exp)
+	}
+	return res * x
+}
+
 sin_v1 :: proc(x: f64) -> f64 {
 	return a * x * x + b * x
 }
@@ -87,6 +99,13 @@ sin_v5 :: proc(x: f64, power: int) -> f64 {
 	return x < 0 ? -num : num
 }
 
+sin_v6 :: proc(x: f64, power: int) -> f64 {
+	pos := math.abs(x)
+	quarter_x := pos > Half_PI ? math.PI - pos : pos
+	num := horner_sine(quarter_x, power)
+
+	return x < 0 ? -num : num
+}
 
 sin_tracker :: proc(t: ^domain_tracker, x: f64) -> f64 {
 	domain := &t.sin
