@@ -50,16 +50,25 @@ factorial :: proc(x: int) -> f64 {
 }
 
 horner_sine :: proc(x: f64, pow: int) -> f64 {
-	a := taylor_coefficient(pow)
 	x2 := x * x
-	exp := pow - 2
 
-	res := taylor_coefficient(exp)
-	for exp -= 2; exp > 0; exp -= 2 {
+	res := taylor_coefficient(pow)
+	for exp := pow - 2; exp > 0; exp -= 2 {
 		res = res * x2 + taylor_coefficient(exp)
 	}
 	return res * x
 }
+
+horner_sine_fused :: proc(x: f64, pow: int) -> f64 {
+	x2 := x * x
+
+	res := taylor_coefficient(pow)
+	for exp := pow - 2; exp > 0; exp -= 2 {
+		res = math.fmuladd(res, x2, taylor_coefficient(exp))
+	}
+	return res * x
+}
+
 
 sin_v1 :: proc(x: f64) -> f64 {
 	return a * x * x + b * x
