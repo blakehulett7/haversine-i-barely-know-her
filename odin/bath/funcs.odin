@@ -69,6 +69,25 @@ horner_sine_fused :: proc(x: f64, pow: int) -> f64 {
 	return res * x
 }
 
+horner_sine_static :: proc(x: f64, pow: int) -> f64 {
+	x2 := x * x
+
+	res := SineRadians_Taylor[(pow - 1) / 2]
+	for exp := pow - 2; exp > 0; exp -= 2 {
+		res = math.fmuladd(res, x2, SineRadians_Taylor[(exp - 1) / 2])
+	}
+	return res * x
+}
+
+minimax_sine_static :: proc(x: f64, terms: int) -> f64 {
+	x2 := x * x
+
+	res := SineRadians_Dmitri[terms][terms - 1]
+	for term := terms - 1; term > 0; term -= 1 {
+		res = math.fmuladd(res, x2, SineRadians_Dmitri[terms][term - 1])
+	}
+	return res * x
+}
 
 sin_v1 :: proc(x: f64) -> f64 {
 	return a * x * x + b * x

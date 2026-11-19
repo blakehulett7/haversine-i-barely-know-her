@@ -90,12 +90,33 @@ main :: proc() {
 		fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
 	}
 
-	fmt.println("\n--- Cos ---")
+	fmt.println("\n--- Sine (Static_Horner) ---")
 	for t in arbitrary_sine_tests {
-		fmt.printf("Depth %s: ", t.cos_name)
-		max_err, input := bath.test_math_arbitrary(0, Half_PI, math.cos_f64, bath.cos_v2, t.power)
+		fmt.printf("Depth %s: ", t.sine_name)
+		max_err, input := bath.test_math_arbitrary(
+			0,
+			Half_PI,
+			math.sin_f64,
+			bath.horner_sine_static,
+			t.power,
+		)
 		fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
 	}
+
+	fmt.println("\n--- Sine (Minimax) ---")
+	max_terms := 11
+	for i in 2 ..= max_terms {
+		fmt.printf("Depth %d: ", i)
+		max_err, input := bath.test_math_arbitrary(
+			0,
+			Half_PI,
+			math.sin_f64,
+			bath.minimax_sine_static,
+			i,
+		)
+		fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
+	}
+
 
 	fmt.println()
 }
