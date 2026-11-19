@@ -89,6 +89,23 @@ minimax_sine_static :: proc(x: f64, terms: int) -> f64 {
 	return res * x
 }
 
+minimax_sine_unrolled :: proc(x: f64) -> f64 {
+	best_depth := 9
+	x2 := x * x
+
+	res := SineRadians_Dmitri[best_depth][8]
+	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][7])
+	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][6])
+	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][5])
+	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][4])
+	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][3])
+	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][2])
+	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][1])
+	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][0])
+
+	return res * x
+}
+
 sin_v1 :: proc(x: f64) -> f64 {
 	return a * x * x + b * x
 }

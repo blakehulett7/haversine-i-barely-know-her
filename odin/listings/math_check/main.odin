@@ -117,6 +117,10 @@ main :: proc() {
 		fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
 	}
 
+	fmt.println("\n--- Sine (Minimax_Unrolled) ---")
+	fmt.printf("Depth %d: ", 9)
+	max_err, input := bath.test_math(0, Half_PI, math.sin_f64, bath.minimax_sine_unrolled)
+	fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
 
 	fmt.println()
 }
