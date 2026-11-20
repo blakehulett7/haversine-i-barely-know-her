@@ -1,9 +1,8 @@
 package main
 
-import "../../bath"
 import "../../bson"
 import "../../generator"
-import "core:fmt"
+import "../../scratch/bath"
 import "core:os"
 import "core:slice"
 
@@ -28,7 +27,7 @@ run :: proc() -> Error {
 	for {
 		haversine_sum: f64
 		for pair, i in parsed.pairs {
-			haversine := bath.reference_haversine(&t, pair.x0, pair.y0, pair.x1, pair.y1)
+			haversine := bath.haversine(&t, pair.x0, pair.y0, pair.x1, pair.y1)
 			haversine_sum += haversine
 			answers[i] = haversine
 		}

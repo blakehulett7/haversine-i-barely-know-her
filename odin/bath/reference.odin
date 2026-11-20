@@ -12,7 +12,7 @@ radians_from_degrees :: proc(degrees: f64) -> f64 {
 
 earth_radius :: 6372.8
 
-reference_haversine :: proc(t: ^domain_tracker, x0, y0, x1, y1: f64) -> f64 {
+haversine :: proc(x0, y0, x1, y1: f64) -> f64 {
 	lat1 := x0
 	lat2 := x1
 	lon1 := y0
@@ -23,13 +23,8 @@ reference_haversine :: proc(t: ^domain_tracker, x0, y0, x1, y1: f64) -> f64 {
 	lat1 = radians_from_degrees(lat1)
 	lat2 = radians_from_degrees(lat2)
 
-	a :=
-		square(sin_tracker(t, dLat / 2.0)) +
-		cos_tracker(t, lat1) * cos_tracker(t, lat2) * square(sin_tracker(t, dLon / 2))
-	c := 2.0 * asin_tracker(t, sqrt_tracker(t, a))
-
-	print(t)
-
+	a := square(sine(dLat / 2.0)) + cos(lat1) * cos(lat2) * square(sine(dLon / 2))
+	c := 2.0 * asine(sqrt(a))
 	result := earth_radius * c
 
 	return result

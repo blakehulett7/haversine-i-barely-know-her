@@ -1,12 +1,11 @@
 package main
 
-import "../../bath"
+import "../../scratch/bath"
 import "base:intrinsics"
 import "core:fmt"
 import "core:math"
 
 Half_PI :: math.PI / 2.0
-
 Max_Arcsine_Range :: 1.0 / intrinsics.sqrt(2.0)
 Max_Depth :: 31
 
@@ -121,7 +120,7 @@ main :: proc() {
 
 	fmt.println("\n--- Sine (Minimax_Unrolled) ---")
 	fmt.printf("Depth %d: ", 9)
-	max_err, input := bath.test_math(0, Half_PI, math.sin_f64, bath.minimax_sine_unrolled)
+	max_err, input := bath.test_math(0, Half_PI, math.sin_f64, bath.sine)
 	fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
 
 	fmt.println("\n--- ArcSine (Minimax_In_Range) ---")
