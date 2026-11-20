@@ -1,11 +1,13 @@
 package main
 
 import "../../bath"
+import "base:intrinsics"
 import "core:fmt"
 import "core:math"
 
 Half_PI :: math.PI / 2.0
 
+Max_Arcsine_Range :: 1.0 / intrinsics.sqrt(2.0)
 Max_Depth :: 31
 
 math_test :: struct {
@@ -120,6 +122,25 @@ main :: proc() {
 	fmt.println("\n--- Sine (Minimax_Unrolled) ---")
 	fmt.printf("Depth %d: ", 9)
 	max_err, input := bath.test_math(0, Half_PI, math.sin_f64, bath.minimax_sine_unrolled)
+	fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
+
+	fmt.println("\n--- ArcSine (Minimax) ---")
+	max_terms = 22
+	for i in 2 ..= max_terms {
+		fmt.printf("Depth %d: ", i)
+		max_err, input := bath.test_math_arbitrary(
+			0,
+			Max_Arcsine_Range,
+			math.asin,
+			bath.minimax_arcsine_static,
+			i,
+		)
+		fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
+	}
+
+	fmt.println("\n--- ArcSine (Minimax_Unrolled) ---")
+	fmt.printf("Depth %d: ", 19)
+	max_err, input = bath.test_math(0, Max_Arcsine_Range, math.asin, bath.minimax_arcsine_unrolled)
 	fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
 
 	fmt.println()

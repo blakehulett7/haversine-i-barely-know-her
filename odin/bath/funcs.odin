@@ -79,6 +79,43 @@ horner_sine_static :: proc(x: f64, pow: int) -> f64 {
 	return res * x
 }
 
+minimax_arcsine_static :: proc(x: f64, terms: int) -> f64 {
+	x2 := x * x
+
+	res := ArcsineRadians_Dmitri[terms][terms - 1]
+	for term := terms - 1; term > 0; term -= 1 {
+		res = math.fmuladd(res, x2, ArcsineRadians_Dmitri[terms][term - 1])
+	}
+	return res * x
+}
+
+minimax_arcsine_unrolled :: proc(x: f64) -> f64 {
+	x2 := x * x
+
+	res := 0h3fedfc53682725ca
+	res = math.fmuladd(res, x2, 0hc00bec6daf74ed61)
+	res = math.fmuladd(res, x2, 0h4018bf4dadaf548c)
+	res = math.fmuladd(res, x2, 0hc01b06f523e74f33)
+	res = math.fmuladd(res, x2, 0h4014537ddde2d76d)
+	res = math.fmuladd(res, x2, 0hc006067d334b4792)
+	res = math.fmuladd(res, x2, 0h3ff1fb54da575b22)
+	res = math.fmuladd(res, x2, 0hbfd57380bcd2890e)
+	res = math.fmuladd(res, x2, 0h3fb69b370aad086e)
+	res = math.fmuladd(res, x2, 0hbf721438ccc95d62)
+	res = math.fmuladd(res, x2, 0h3f8b8a33b8e380ef)
+	res = math.fmuladd(res, x2, 0h3f8c37061f4e5f55)
+	res = math.fmuladd(res, x2, 0h3f91c875d6c5323d)
+	res = math.fmuladd(res, x2, 0h3f96e88ce94d1149)
+	res = math.fmuladd(res, x2, 0h3f9f1c73443a02f5)
+	res = math.fmuladd(res, x2, 0h3fa6db6db3184756)
+	res = math.fmuladd(res, x2, 0h3fb3333333380df2)
+	res = math.fmuladd(res, x2, 0h3fc555555555531e)
+	res = math.fmuladd(res, x2, 0h3ff0000000000000)
+
+	return res * x
+}
+
+
 minimax_sine_static :: proc(x: f64, terms: int) -> f64 {
 	x2 := x * x
 
@@ -90,7 +127,6 @@ minimax_sine_static :: proc(x: f64, terms: int) -> f64 {
 }
 
 minimax_sine_unrolled :: proc(x: f64) -> f64 {
-	best_depth := 9
 	x2 := x * x
 
 	res := 0h3ce883c1c5deffbe
