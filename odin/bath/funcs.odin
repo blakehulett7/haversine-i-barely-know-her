@@ -93,15 +93,15 @@ minimax_sine_unrolled :: proc(x: f64) -> f64 {
 	best_depth := 9
 	x2 := x * x
 
-	res := SineRadians_Dmitri[best_depth][8]
-	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][7])
-	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][6])
-	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][5])
-	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][4])
-	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][3])
-	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][2])
-	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][1])
-	res = math.fmuladd(res, x2, SineRadians_Dmitri[best_depth][0])
+	res := 0h3ce883c1c5deffbe
+	res = math.fmuladd(res, x2, 0hbd6ae43dc9bf8ba7)
+	res = math.fmuladd(res, x2, 0h3de6123ce513b09f)
+	res = math.fmuladd(res, x2, 0hbe5ae6454d960ac4)
+	res = math.fmuladd(res, x2, 0h3ec71de3a52aab96)
+	res = math.fmuladd(res, x2, 0hbf2a01a01a014eb6)
+	res = math.fmuladd(res, x2, 0h3f811111111110c9)
+	res = math.fmuladd(res, x2, 0hbfc5555555555555)
+	res = math.fmuladd(res, x2, 0h3ff0000000000000)
 
 	return res * x
 }
