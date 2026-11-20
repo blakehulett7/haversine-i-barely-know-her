@@ -1,12 +1,12 @@
 package bath
 
 import "base:intrinsics"
-import "core:fmt"
 import "core:math"
 
 a: f64 = -4.0 / (math.PI * math.PI)
 b: f64 = 4.0 / math.PI
 Half_PI: f64 = math.PI / 2.0
+Max_ArcSine: f64 = 1.0 / math.sqrt(2.0)
 
 domain_tracker :: struct {
 	asin: domain,
@@ -21,7 +21,18 @@ domain :: struct {
 	min:         f64,
 }
 
-asin :: proc(t: ^domain_tracker, x: f64) -> f64 {
+asine :: proc(x: f64) -> f64 {
+	if x <= Max_ArcSine {
+		return minimax_arcsine_unrolled(x)
+	}
+
+	x2 := x * x
+	shifted_x := sqrt(1 - x2)
+	core := minimax_arcsine_unrolled(shifted_x)
+	return Half_PI - core
+}
+
+asin_tracker :: proc(t: ^domain_tracker, x: f64) -> f64 {
 	domain := &t.asin
 	track(domain, x)
 	return math.asin(x)

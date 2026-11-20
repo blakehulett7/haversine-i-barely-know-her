@@ -124,7 +124,7 @@ main :: proc() {
 	max_err, input := bath.test_math(0, Half_PI, math.sin_f64, bath.minimax_sine_unrolled)
 	fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
 
-	fmt.println("\n--- ArcSine (Minimax) ---")
+	fmt.println("\n--- ArcSine (Minimax_In_Range) ---")
 	max_terms = 22
 	for i in 2 ..= max_terms {
 		fmt.printf("Depth %d: ", i)
@@ -138,9 +138,23 @@ main :: proc() {
 		fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
 	}
 
-	fmt.println("\n--- ArcSine (Minimax_Unrolled) ---")
+	fmt.println("\n--- ArcSine (Minimax_Full_Range) ---")
+	max_terms = 22
+	for i in 2 ..= max_terms {
+		fmt.printf("Depth %d: ", i)
+		max_err, input := bath.test_math_arbitrary(0, 1, math.asin, bath.minimax_arcsine_static, i)
+		fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
+	}
+
+
+	fmt.println("\n--- ArcSine (Minimax_Unrolled_In_Range) ---")
 	fmt.printf("Depth %d: ", 19)
 	max_err, input = bath.test_math(0, Max_Arcsine_Range, math.asin, bath.minimax_arcsine_unrolled)
+	fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
+
+	fmt.println("\n--- ArcSine (Minimax_Unrolled_Full_Range) ---")
+	fmt.printf("Depth %d: ", 19)
+	max_err, input = bath.test_math(0, 1, math.asin, bath.asine)
 	fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
 
 	fmt.println()
