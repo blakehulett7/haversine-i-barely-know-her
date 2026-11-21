@@ -8,6 +8,7 @@ import "perform"
 
 Config :: struct {
 	generate: bool `args:"name=g" usage:"pass true to generate new input file"`,
+	test:     bool `args:"name=t" usage:"pass true to test the blake math"`,
 	num:      u64 `args:"name=n" usage:"enter number of pairs to generate"`,
 	seed:     u64 `args:"name=s" usage:"enter a random seed"`,
 	data:     string `args:"name=d" usage:"enter the path to the input json file"`,
@@ -36,6 +37,15 @@ main :: proc() {
 	if path == "" {
 		fmt.println("using default data path")
 		path = "data/pairs.json"
+	}
+
+	if config.test {
+		err := perform.test(path)
+		if err != nil {
+			fmt.printfln("error testing blake math: %v", err)
+			os.exit(1)
+		}
+		os.exit(0)
 	}
 
 	err := perform.work(path)

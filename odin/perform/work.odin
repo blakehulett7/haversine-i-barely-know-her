@@ -16,7 +16,7 @@ work :: proc(path: string) -> Error {
 	anchor_idx: int
 	{
 		_, anchor_idx, _ = metrics.profile("read")
-		data = os.read_entire_file("data/pairs.json", context.allocator) or_return
+		data = os.read_entire_file(path, context.allocator) or_return
 	}
 
 	metrics.add_bandwith_data(anchor_idx, u64(len(data)))

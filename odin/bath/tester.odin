@@ -8,12 +8,11 @@ tester :: struct {
 }
 
 math_lib_func :: proc "contextless" (x: f64) -> f64
-math_func :: proc(x: f64) -> f64
 
 test_math :: proc(
 	min_x, max_x: f64,
 	baseline_func: math_lib_func,
-	optimized_func: math_func,
+	optimized_func: math_lib_func,
 ) -> (
 	max_err, input: f64,
 ) {

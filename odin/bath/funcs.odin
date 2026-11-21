@@ -6,7 +6,7 @@ import "core:math"
 Half_PI: f64 = math.PI / 2.0
 Max_ArcSine: f64 = 1.0 / sqrt(2.0)
 
-asine :: proc(x: f64) -> f64 {
+asine :: proc "contextless" (x: f64) -> f64 {
 	if x <= Max_ArcSine {
 		return minimax_arcsine_unrolled(x)
 	}
@@ -17,12 +17,12 @@ asine :: proc(x: f64) -> f64 {
 	return Half_PI - core
 }
 
-cos :: proc(x: f64) -> f64 {
+cos :: proc "contextless" (x: f64) -> f64 {
 	return sine(x + Half_PI)
 }
 
 @(private)
-minimax_arcsine_unrolled :: proc(x: f64) -> f64 {
+minimax_arcsine_unrolled :: proc "contextless" (x: f64) -> f64 {
 	x2 := x * x
 
 	res := 0h3fedfc53682725ca
@@ -49,7 +49,7 @@ minimax_arcsine_unrolled :: proc(x: f64) -> f64 {
 }
 
 @(private)
-minimax_sine_unrolled :: proc(x: f64) -> f64 {
+minimax_sine_unrolled :: proc "contextless" (x: f64) -> f64 {
 	x2 := x * x
 
 	res := 0h3ce883c1c5deffbe
@@ -65,7 +65,7 @@ minimax_sine_unrolled :: proc(x: f64) -> f64 {
 	return res * x
 }
 
-sine :: proc(x: f64) -> f64 {
+sine :: proc "contextless" (x: f64) -> f64 {
 	pos := math.abs(x)
 	quarter_x := pos > Half_PI ? math.PI - pos : pos
 	num := minimax_sine_unrolled(quarter_x)

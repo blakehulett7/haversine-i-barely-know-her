@@ -38,5 +38,10 @@ main :: proc() {
 	max_err, input = bath.test_math(-math.PI, math.PI, math.sin, bath.sine)
 	fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
 
+	fmt.println("\n--- Sqrt ---")
+	fmt.print("Depth chip: ")
+	max_err, input = bath.test_math(0, 1, math.sqrt, bath.sqrt)
+	fmt.printfln("f(%.17f) -> max err: %.17f", input, max_err)
+
 	fmt.println()
 }
