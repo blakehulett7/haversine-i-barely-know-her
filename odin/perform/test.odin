@@ -5,6 +5,7 @@ import "../bson"
 import "../calc"
 import "../generator"
 import "core:fmt"
+import "core:math"
 import "core:os"
 
 test :: proc(path: string) -> Error {
@@ -17,13 +18,19 @@ test :: proc(path: string) -> Error {
 
 	reference_haversine_sum: f64
 	bath_haversine_sum: f64
+	max_drift: f64
 
 	for pair, i in parsed.pairs {
 		reference_haversine := calc.reference_haversine(pair.x0, pair.y0, pair.x1, pair.y1)
 		bath_haversine := bath.haversine(pair.x0, pair.y0, pair.x1, pair.y1)
-
+		drift := math.abs(reference_haversine - bath_haversine)
 		reference_haversine_sum += reference_haversine
 		bath_haversine_sum += bath_haversine
+
+		if drift > max_drift {
+			max_drift = drift
+			fmt.printf("max drift: %.17f\r", max_drift)
+		}
 	}
 
 	avg_reference_haversine := reference_haversine_sum / f64(len(parsed.pairs))
