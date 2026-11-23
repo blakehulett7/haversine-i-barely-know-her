@@ -1,5 +1,6 @@
 package main
 
+import reps "tester"
 import "core:fmt"
 import "core:math"
 import "core:mem/virtual"
@@ -61,10 +62,10 @@ foreign lib {
 
 alignment_test :: proc "cdecl" (count: uint)
 asm_func :: proc "cdecl" (dest: ^byte, count: uint)
-cache_func :: proc(t: ^tester, dest: []byte, mask: uint)
-test_func :: proc(t: ^tester, path: string, with_malloc: bool)
+cache_func :: proc(t: ^reps.tester, dest: []byte, mask: uint)
+test_func :: proc(t: ^reps.tester, path: string, with_malloc: bool)
 
-default :: proc(t: ^tester, path: string, with_malloc: bool) {
+default :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	arena: virtual.Arena
 	allocator := context.allocator
 
@@ -79,21 +80,21 @@ default :: proc(t: ^tester, path: string, with_malloc: bool) {
 
 	defer virtual.arena_destroy(&arena)
 
-	for is_testing(t) {
-		begin_time(t)
+	for reps.is_testing(t) {
+		reps.begin_time(t)
 		data, err := os.read_entire_file(path, allocator)
-		end_time(t, u64(len(data)))
+		reps.end_time(t, u64(len(data)))
 
 		if t.target_processed_bytes == 0 {
 			t.target_processed_bytes = i64(len(data))
-			count_bytes(t, u64(len(data)))
+			reps.count_bytes(t, u64(len(data)))
 		}
 
 		if err != nil {
 			t.mode = .errored
 			continue
 		}
-		count_bytes(t, u64(len(data)))
+		reps.count_bytes(t, u64(len(data)))
 
 		if with_malloc {
 			free_all(allocator)
@@ -103,7 +104,7 @@ default :: proc(t: ^tester, path: string, with_malloc: bool) {
 	}
 }
 
-write_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
+write_all_bytes :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	arena: virtual.Arena
 	allocator := context.allocator
 
@@ -130,16 +131,16 @@ write_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
 
 	t.target_processed_bytes = size
 
-	for is_testing(t) {
+	for reps.is_testing(t) {
 		dest := make([]byte, size, allocator)
 
-		begin_time(t)
+		reps.begin_time(t)
 		for i in 0 ..< size {
 			dest[i] = byte(i)
 		}
-		end_time(t, u64(size))
+		reps.end_time(t, u64(size))
 
-		count_bytes(t, u64(size))
+		reps.count_bytes(t, u64(size))
 
 		if with_malloc {
 			free_all(allocator)
@@ -149,7 +150,7 @@ write_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
 	}
 }
 
-write_all_bytes_backward :: proc(t: ^tester, path: string, with_malloc: bool) {
+write_all_bytes_backward :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	arena: virtual.Arena
 	allocator := context.allocator
 
@@ -174,20 +175,20 @@ write_all_bytes_backward :: proc(t: ^tester, path: string, with_malloc: bool) {
 		return
 	}
 
-	for is_testing(t) {
+	for reps.is_testing(t) {
 		dest := make([]byte, size, allocator)
 
-		begin_time(t)
+		reps.begin_time(t)
 		for i in 0 ..< size {
 			dest[(len(dest) - 1) - int(i)] = byte(i)
 		}
-		end_time(t, u64(size))
+		reps.end_time(t, u64(size))
 
 		if t.target_processed_bytes == 0 {
 			t.target_processed_bytes = size
-			count_bytes(t, u64(size))
+			reps.count_bytes(t, u64(size))
 		}
-		count_bytes(t, u64(size))
+		reps.count_bytes(t, u64(size))
 
 		if with_malloc {
 			free_all(allocator)
@@ -197,227 +198,227 @@ write_all_bytes_backward :: proc(t: ^tester, path: string, with_malloc: bool) {
 	}
 }
 
-custom_asm :: proc(t: ^tester, path: string, func: asm_func) {
+custom_asm :: proc(t: ^reps.tester, path: string, func: asm_func) {
 	size: i64 = 4 * 1024 * 1024 * 1024
 
-	for is_testing(t) {
+	for reps.is_testing(t) {
 		dest := make([]byte, size)
 
-		begin_time(t)
+		reps.begin_time(t)
 		func(raw_data(dest), uint(size))
-		end_time(t, u64(size))
+		reps.end_time(t, u64(size))
 
 		if t.target_processed_bytes == 0 {
 			t.target_processed_bytes = size
-			count_bytes(t, u64(size))
+			reps.count_bytes(t, u64(size))
 		}
-		count_bytes(t, u64(size))
+		reps.count_bytes(t, u64(size))
 
 		delete(dest)
 	}
 }
 
-custom_cache :: proc(t: ^tester, dest: []byte, mask: uint) {
+custom_cache :: proc(t: ^reps.tester, dest: []byte, mask: uint) {
 	count: u64 = 4 * 1024 * 1024 * 1024
 	bits := 1 << mask
 
-	for is_testing(t) {
-		begin_time(t)
+	for reps.is_testing(t) {
+		reps.begin_time(t)
 		Cache(raw_data(dest), uint(count), uint(bits))
-		end_time(t, count)
+		reps.end_time(t, count)
 
 		if t.target_processed_bytes == 0 {
 			t.target_processed_bytes = i64(count)
-			count_bytes(t, count)
+			reps.count_bytes(t, count)
 		}
-		count_bytes(t, count)
+		reps.count_bytes(t, count)
 	}
 }
 
-custom_alignment_test :: proc(t: ^tester, path: string, func: alignment_test) {
+custom_alignment_test :: proc(t: ^reps.tester, path: string, func: alignment_test) {
 	count: u64 = 1024 * 1024 * 1024
 
-	for is_testing(t) {
-		begin_time(t)
+	for reps.is_testing(t) {
+		reps.begin_time(t)
 		func(uint(count))
-		end_time(t, count)
+		reps.end_time(t, count)
 
 		if t.target_processed_bytes == 0 {
 			t.target_processed_bytes = i64(count)
-			count_bytes(t, count)
+			reps.count_bytes(t, count)
 		}
-		count_bytes(t, count)
+		reps.count_bytes(t, count)
 	}
 }
 
-mov_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
+mov_all_bytes :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, MOVAllBytesASM)
 }
 
-nop_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
+nop_all_bytes :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, NOPAllBytesASM)
 }
 
-cmp_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
+cmp_all_bytes :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, CMPAllBytesASM)
 }
 
-dec_all_bytes :: proc(t: ^tester, path: string, with_malloc: bool) {
+dec_all_bytes :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, DECAllBytesASM)
 }
 
-nop_4x1 :: proc(t: ^tester, path: string, with_malloc: bool) {
+nop_4x1 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, NOP4x1AllBytesASM)
 }
 
-nop_4x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+nop_4x3 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, NOP4x3AllBytesASM)
 }
 
-nop_4x9 :: proc(t: ^tester, path: string, with_malloc: bool) {
+nop_4x9 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, NOP4x9AllBytesASM)
 }
 
-nop_x1 :: proc(t: ^tester, path: string, with_malloc: bool) {
+nop_x1 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, NOPx1AllBytesASM)
 }
 
-nop_x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+nop_x3 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, NOPx3AllBytesASM)
 }
 
-nop_x9 :: proc(t: ^tester, path: string, with_malloc: bool) {
+nop_x9 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, NOPx9AllBytesASM)
 }
 
-nop_x18 :: proc(t: ^tester, path: string, with_malloc: bool) {
+nop_x18 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, NOPx18AllBytesASM)
 }
 
-read_x1 :: proc(t: ^tester, path: string, with_malloc: bool) {
+read_x1 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Read_x1)
 }
 
-read_x2 :: proc(t: ^tester, path: string, with_malloc: bool) {
+read_x2 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Read_x2)
 }
 
-read_x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+read_x3 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Read_x3)
 }
 
-read_x4 :: proc(t: ^tester, path: string, with_malloc: bool) {
+read_x4 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Read_x4)
 }
 
-write_x1 :: proc(t: ^tester, path: string, with_malloc: bool) {
+write_x1 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Write_x1)
 }
 
-write_x2 :: proc(t: ^tester, path: string, with_malloc: bool) {
+write_x2 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Write_x2)
 }
 
-write_x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+write_x3 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Write_x3)
 }
 
-write_x4 :: proc(t: ^tester, path: string, with_malloc: bool) {
+write_x4 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Write_x4)
 }
 
-read_4x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+read_4x3 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Read_4x3)
 }
 
-read_8x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+read_8x3 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Read_8x3)
 }
 
-read_16x2 :: proc(t: ^tester, path: string, with_malloc: bool) {
+read_16x2 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Read_16x2)
 }
 
-read_16x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+read_16x3 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Read_16x3)
 }
 
-read_32x2 :: proc(t: ^tester, path: string, with_malloc: bool) {
+read_32x2 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Read_32x2)
 }
 
-read_32x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+read_32x3 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Read_32x3)
 }
 
-read_64x3 :: proc(t: ^tester, path: string, with_malloc: bool) {
+read_64x3 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Read_64x3)
 }
 
-cache_4k :: proc(t: ^tester, path: string, with_malloc: bool) {
+cache_4k :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Cache_4K)
 }
 
-cache_64k :: proc(t: ^tester, path: string, with_malloc: bool) {
+cache_64k :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Cache_64K)
 }
 
-cache_1m :: proc(t: ^tester, path: string, with_malloc: bool) {
+cache_1m :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Cache_1M)
 }
 
-cache_16m :: proc(t: ^tester, path: string, with_malloc: bool) {
+cache_16m :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Cache_16M)
 }
 
-cache_256m :: proc(t: ^tester, path: string, with_malloc: bool) {
+cache_256m :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Cache_256M)
 }
 
-cache_4g :: proc(t: ^tester, path: string, with_malloc: bool) {
+cache_4g :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_asm(t, path, Cache_4G)
 }
 
-conditional_nop :: proc(t: ^tester, dest: []byte) {
+conditional_nop :: proc(t: ^reps.tester, dest: []byte) {
 	size := i64(len(dest))
 
-	for is_testing(t) {
-		begin_time(t)
+	for reps.is_testing(t) {
+		reps.begin_time(t)
 		ConditionalNOP(raw_data(dest), uint(size))
-		end_time(t, u64(size))
+		reps.end_time(t, u64(size))
 
 		if t.target_processed_bytes == 0 {
 			t.target_processed_bytes = size
-			count_bytes(t, u64(size))
+			reps.count_bytes(t, u64(size))
 		}
-		count_bytes(t, u64(size))
+		reps.count_bytes(t, u64(size))
 	}
 }
 
-alignment_64 :: proc(t: ^tester, path: string, with_malloc: bool) {
+alignment_64 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_alignment_test(t, path, NOPAligned64)
 }
 
-alignment_4 :: proc(t: ^tester, path: string, with_malloc: bool) {
+alignment_4 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_alignment_test(t, path, NOPAligned4)
 }
 
-alignment_16 :: proc(t: ^tester, path: string, with_malloc: bool) {
+alignment_16 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_alignment_test(t, path, NOPAligned16)
 }
 
-alignment_32 :: proc(t: ^tester, path: string, with_malloc: bool) {
+alignment_32 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_alignment_test(t, path, NOPAligned32)
 }
 
-alignment_60 :: proc(t: ^tester, path: string, with_malloc: bool) {
+alignment_60 :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_alignment_test(t, path, NOPAligned60)
 }
 
-rat_add :: proc(t: ^tester, path: string, with_malloc: bool) {
+rat_add :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_alignment_test(t, path, RATAdd)
 }
 
-rat_mov_add :: proc(t: ^tester, path: string, with_malloc: bool) {
+rat_mov_add :: proc(t: ^reps.tester, path: string, with_malloc: bool) {
 	custom_alignment_test(t, path, RATMovAdd)
 }

@@ -1,5 +1,6 @@
 package main
 
+import reps "tester"
 import "base:intrinsics"
 import "core:fmt"
 
@@ -38,7 +39,7 @@ path :: "../data/pairs.json"
 main :: proc() {
 	tests := [?]repetition_test{{"read_16x3", read_16x3, false}, {"read_32x3", read_32x3, false}}
 
-	testers: [len(tests)]tester
+	testers: [len(tests)]reps.tester
 	cpu_freq := intrinsics.read_cycle_counter_frequency()
 
 	dest := make([]byte, size)
@@ -51,14 +52,14 @@ main :: proc() {
 			fmt.printf("\n--- %s", test.name)
 			fmt.print(" ---\n")
 			t := testers[i]
-			start_wave(&t, cpu_freq)
+			reps.start_wave(&t, cpu_freq)
 			test.func(&t, path, test.with_malloc)
 		}
 	}
 }
 
 nop_test :: proc() {
-	testers: [branch_pattern]tester
+	testers: [branch_pattern]reps.tester
 	cpu_freq := intrinsics.read_cycle_counter_frequency()
 
 	for {
@@ -70,7 +71,7 @@ nop_test :: proc() {
 			fmt.println(buffer[len(buffer) - 32:])
 
 			t := testers[pattern]
-			start_wave(&t, cpu_freq)
+			reps.start_wave(&t, cpu_freq)
 			conditional_nop(&t, buffer)
 
 			delete(buffer)

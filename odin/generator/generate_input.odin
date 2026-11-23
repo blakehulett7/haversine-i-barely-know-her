@@ -90,6 +90,7 @@ input :: proc(seed, num: u64) -> Error {
 
 	data := json.marshal(o, json.Marshal_Options{pretty = true}) or_return
 	os.write_entire_file("data/pairs.json", data) or_return
+	os.write_entire_file("data/pairs.f64", slice.to_bytes(o.pairs[:])) or_return
 	os.write_entire_file("data/answers.f64", slice.to_bytes(answers)) or_return
 
 	delete(result)

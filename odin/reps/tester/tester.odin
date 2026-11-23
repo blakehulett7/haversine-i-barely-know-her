@@ -1,9 +1,21 @@
-package main
+package reps
 
-import "../metrics"
+import "../../metrics"
 import "base:intrinsics"
 import "core:fmt"
 import "core:os"
+
+tester :: struct {
+	mode:                   test_mode,
+	closed_blocks:          u32,
+	open_blocks:            u32,
+	cpu_freq:               i64,
+	started_at:             i64,
+	target_processed_bytes: i64,
+	try_for:                i64,
+	accumulator:            repetition_metric,
+	results:                test_results,
+}
 
 begin_time :: proc(t: ^tester) {
 	t.open_blocks += 1
@@ -21,8 +33,10 @@ end_time :: proc(t: ^tester, bytes: u64) {
 	t.accumulator[properties.page_faults] += u64(metrics.read_page_faults())
 
 	if t.target_processed_bytes == 0 {
-		count_bytes(t, bytes)
+		t.target_processed_bytes = i64(bytes)
 	}
+
+	count_bytes(t, bytes)
 }
 
 error :: proc(t: ^tester, msg: string) {
@@ -129,7 +143,14 @@ update_results :: proc(t: ^tester, current_time: i64) {
 	}
 
 	if t.accumulator[properties.bytes] != u64(t.target_processed_bytes) {
-		error(t, "did not process correct bytes")
+		error(
+			t,
+			fmt.aprintf(
+				"did not process correct bytes:\n\ttarget: %d\n\tgot: %d",
+				t.target_processed_bytes,
+				t.accumulator[properties.bytes],
+			),
+		)
 		return
 	}
 
