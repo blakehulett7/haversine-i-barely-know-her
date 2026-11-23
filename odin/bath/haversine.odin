@@ -15,6 +15,8 @@ radians_from_degrees :: proc(degrees: f64) -> f64 {
 
 earth_radius :: 6372.8
 Double_Earth_Radius :: 2.0 * earth_radius
+Rad_converter :: 0.01745329251994329577
+Half_rad_converter :: Rad_converter / 2
 
 haversine :: proc(x0, y0, x1, y1: f64) -> f64 {
 	lat1 := x0
@@ -225,13 +227,11 @@ simplified_haversine_v6 :: proc(pairs: []generator.Pair) -> f64 {
 	sum: f64
 	sum_coefficient := Double_Earth_Radius / f64(len(pairs))
 	for pair in pairs {
-		rad_converter := 0.01745329251994329577
-		half_rad_converter := rad_converter / 2
-		lat_coefficient_1 := pair.x0 < 0 ? rad_converter : -rad_converter
-		lat_coefficient_2 := pair.x1 < 0 ? rad_converter : -rad_converter
+		lat_coefficient_1 := pair.x0 < 0 ? Rad_converter : -Rad_converter
+		lat_coefficient_2 := pair.x1 < 0 ? Rad_converter : -Rad_converter
 
-		half_dLat := half_rad_converter * (pair.x1 - pair.x0)
-		half_dLon := half_rad_converter * (pair.y1 - pair.y0)
+		half_dLat := Half_rad_converter * (pair.x1 - pair.x0)
+		half_dLon := Half_rad_converter * (pair.y1 - pair.y0)
 		shifted_lat1 := math.fmuladd(lat_coefficient_1, pair.x0, Half_PI)
 		shifted_lat2 := math.fmuladd(lat_coefficient_2, pair.x1, Half_PI)
 
