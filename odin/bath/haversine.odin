@@ -222,7 +222,7 @@ simplified_haversine_v5 :: proc(pairs: []generator.Pair) -> f64 {
 	return sum
 }
 
-simplified_haversine_v6 :: proc(pairs: []generator.Pair) -> f64 {
+simplified_haversine :: proc(pairs: []generator.Pair) -> f64 {
 	// NOTE: not sure how this math works, but its a further input simplifier
 	sum: f64
 	sum_coefficient := Double_Earth_Radius / f64(len(pairs))
