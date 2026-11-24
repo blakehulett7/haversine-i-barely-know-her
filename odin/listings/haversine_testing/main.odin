@@ -22,7 +22,7 @@ main :: proc() {
 		{"v3", bath.simplified_haversine_v3},
 		{"v4", bath.simplified_haversine_v4},
 		{"v5", bath.simplified_haversine_v5},
-		{"v6", bath.simplified_haversine_v6},
+		{"v6", bath.simplified_haversine},
 	}
 
 	testers: [len(tests)]reps.tester
